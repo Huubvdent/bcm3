@@ -15,7 +15,7 @@ public:
 
 	bool SetInitialConditionsFromModel(const std::map<size_t, Experiment::SetSpecies>& set_species_map, const std::map<size_t, size_t>& set_init_map, const std::map<size_t, std::vector<int>>& ratio_active_map, const std::map<size_t, std::vector<int>>& ratio_inactive_map, const std::map<size_t, std::vector<size_t>>& ratio_total_active,const std::map<size_t, std::vector<size_t>>& ratio_total_inactive,const VectorReal& transformed_values, Real time);
 	bool SetInitialConditionsFromOtherCell(const Cell* other);
-	bool Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::make_shared<VarEncoder> encoder, std::make_shared<Decoder> decoder, torch::Tensor mean, torch::tensor std);
+	bool Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<VarEncoder> encoder, std::shared_ptr<Decoder> decoder, torch::Tensor mean, torch::tensor std);
 
 	bool Simulate(Real end_time, bool &die, bool &divide, Real& achieved_time);
 

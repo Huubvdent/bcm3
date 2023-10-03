@@ -37,7 +37,7 @@ struct VarEncoder : torch::nn::Module
         fc4->bias = encoder_4_bias;
     }
 
-    torch::nn::Linear fc1, fc2, fc3, fc4;
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 
 };
 
@@ -68,6 +68,6 @@ struct Decoder : torch::nn::Module {
         fc3->bias = decoder_3_bias;
     }
 
-    torch::nn::Linear fc1, fc2, fc3;
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
 
 };
