@@ -37,6 +37,7 @@ if(CMAKE_HOST_UNIX)
 endif(CMAKE_HOST_UNIX)
 
 include_directories(/home/h.vd.ent/libtorch/include)
+include_directories(/home/h.vd.ent/libtorch/include/torch/csrc/api/include)
 
 add_subdirectory(dependencies/cluster-1.52a/src)
 add_subdirectory(dependencies/cvode-5.3.0)
