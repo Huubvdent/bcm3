@@ -20,6 +20,8 @@ struct VarEncoder : torch::nn::Module {
         return z;
     }
 
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
+
 };
 
 struct Decoder : torch::nn::Module {
@@ -35,5 +37,7 @@ struct Decoder : torch::nn::Module {
         x = torch::sigmoid(fc3->forward(x));
         return x;
     }
+
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
 
 };
