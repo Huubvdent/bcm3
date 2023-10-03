@@ -2,7 +2,7 @@
 
 #include <torch/script.h>
 
-struct VarEncoder : torch::nn::Module {
+struct VarEncoder : torch::jit::nn::Module {
     VarEncoder () {
         fc1 = register_module("fc1", torch::nn::Linear(13, 10));
         fc2 = register_module("fc2", torch::nn::Linear(10, 6));
@@ -20,11 +20,11 @@ struct VarEncoder : torch::nn::Module {
         return z;
     }
 
-    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
+    torch::jit::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 
 };
 
-struct Decoder : torch::nn::Module {
+struct Decoder : torch::jit::nn::Module {
     Decoder () {
         fc1 = register_module("fc1", torch::nn::Linear(2, 6));
         fc2 = register_module("fc2", torch::nn::Linear(6, 10));
@@ -38,6 +38,6 @@ struct Decoder : torch::nn::Module {
         return x;
     }
 
-    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
+    torch::jit::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
 
 };
