@@ -1193,17 +1193,14 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	torch::Tensor mean = container.attr("mean").toTensor();
 	torch::Tensor std = container.attr("std").toTensor();
 
-	encoder_ref = *encoder;
-	decoder_ref = *decoder;
+	encoder->load_state_dict(container.attr("encoder"));
+	decoder->load_state_dict(container.attr("decoder"));
 
-	encoder_ref.load_state_dict(container.attr("encoder"));
-	decoder_ref.load_state_dict(container.attr("decoder"));
+	encoder->eval();
+	decoder->eval();
 
-	encoder_ref.eval();
-	decoder_ref.eval();
-
-	encoder_ref.no_grad();
-	decoder_ref.no_grad();
+	encoder->no_grad();
+	decoder->no_grad();
 #endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, mean, std);
