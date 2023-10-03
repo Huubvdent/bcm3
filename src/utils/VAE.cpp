@@ -1,6 +1,7 @@
 #include "VAE.h"
 
 #include <torch/script.h>
+#include <torch/torch.h>
 
 struct VarEncoder : torch::nn::Module {
     VarEncoder () {
