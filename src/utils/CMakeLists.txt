@@ -31,6 +31,8 @@ target_sources(utils
     Typedefs.h
     Utils.h
     Utils.cpp
+    VAE.cpp
+    VAE.h
     VectorUtils.h
     VectorUtils.cpp
     Version.h
