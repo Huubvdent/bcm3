@@ -8,6 +8,7 @@
 #include <fstream>
 #include "../../dependencies/cvode-5.3.0/src/cvode/cvode_impl.h"
 #include <torch/script.h>
+#include "VAE.h"
 
 
 size_t Cell::total_num_simulations = 0;

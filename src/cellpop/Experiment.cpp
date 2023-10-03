@@ -7,6 +7,7 @@
 #include "SBMLSpecies.h"
 #include "Timer.h"
 #include "VariabilityDescription.h"
+#include "VAE.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
