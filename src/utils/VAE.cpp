@@ -6,12 +6,11 @@
 struct VarEncoder : torch::nn::Module 
 {
     VarEncoder () 
-    {
-        fc1 = register_module("fc1", torch::nn::Linear(13, 10));
-        fc2 = register_module("fc2", torch::nn::Linear(10, 6));
-        fc3 = register_module("fc3", torch::nn::Linear(6, 2));
-        fc4 = register_module("fc4", torch::nn::Linear(6, 2));
-    }
+      : fc1(register_module("fc1", torch::nn::Linear(13, 10))),
+        fc2(register_module("fc2", torch::nn::Linear(10, 6))),
+        fc3(register_module("fc3", torch::nn::Linear(6, 2))),
+        fc4(register_module("fc4", torch::nn::Linear(6, 2)))
+    {}
 
     torch::Tensor forward(torch::Tensor x, torch::Tensor sobol_tensor) 
     {
@@ -37,17 +36,16 @@ struct VarEncoder : torch::nn::Module
         fc4->bias = encoder_4_bias;
     }
 
-    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
+    torch::nn::Linear fc1, fc2, fc3, fc4;
 
 };
 
 struct Decoder : torch::nn::Module {
     Decoder () 
-    {
-        fc1 = register_module("fc1", torch::nn::Linear(2, 6));
-        fc2 = register_module("fc2", torch::nn::Linear(6, 10));
-        fc3 = register_module("fc3", torch::nn::Linear(10, 13));
-    }
+        : fc1(register_module("fc1", torch::nn::Linear(2, 6))),
+          fc2(register_module("fc2", torch::nn::Linear(6, 10))),
+          fc3(register_module("fc3", torch::nn::Linear(10, 13)))
+    {}
 
     torch::Tensor forward(torch::Tensor x) 
     {
@@ -68,6 +66,6 @@ struct Decoder : torch::nn::Module {
         fc3->bias = decoder_3_bias;
     }
 
-    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
+    torch::nn::Linear fc1, fc2, fc3;
 
 };
