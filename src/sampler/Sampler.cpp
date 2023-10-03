@@ -122,18 +122,18 @@ namespace bcm3 {
 			pr->NotifyStop();
 		}
 
-		LOG("Sampling finished.");
+		BCMLOG("Sampling finished.");
 
 		LogStatistics();
 
 		double integration_time = timer.GetElapsedSeconds();
-		LOG("");
-		LOG("Timing information:");
-		LOG("  Integration time: %.3g seconds", integration_time);
-		LOG("  Number of likelihood evaluations: %u", (size_t)num_likelihood_evaluations);
-		LOG("  Evaluations per second: %.0f", num_likelihood_evaluations / integration_time);
-		LOG("");
-		LOG("CPU information:");
+		BCMLOG("");
+		BCMLOG("Timing information:");
+		BCMLOG("  Integration time: %.3g seconds", integration_time);
+		BCMLOG("  Number of likelihood evaluations: %u", (size_t)num_likelihood_evaluations);
+		BCMLOG("  Evaluations per second: %.0f", num_likelihood_evaluations / integration_time);
+		BCMLOG("");
+		BCMLOG("CPU information:");
 		bcm3::logger->LogCPUInfo();
 
 		return true;
@@ -195,7 +195,7 @@ namespace bcm3 {
 
 		int integer_progress = (int)(p * 100);
 		if (integer_progress > logged_progress) {
-			LOG("Progress %d%%", integer_progress);
+			BCMLOG("Progress %d%%", integer_progress);
 			logged_progress = integer_progress;
 		}
 	}

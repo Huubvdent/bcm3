@@ -115,7 +115,7 @@ specified position.  The value returned is of the datatype of the tensor.
 
     // Print elements of a tensor.
     for (int i = 0; i < 2; ++i) {
-      LOG(INFO) << t_3d(i, 0, 0);
+      BCMLOG(INFO) << t_3d(i, 0, 0);
     }
 
 

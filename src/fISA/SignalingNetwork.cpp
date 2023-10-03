@@ -923,10 +923,10 @@ bool SignalingNetwork::SolveSystem(NonlinearSystem& system, VectorReal& activiti
 	}
 
 	//if (system.signaling_ix.size() == 4) {
-	//	LOG("%.8g\t%.8g\t%.8g\t%.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3));
+	//	BCMLOG("%.8g\t%.8g\t%.8g\t%.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3));
 	//}
 	//if (system.signaling_ix.size() == 12) {
-	//	LOG("%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
+	//	BCMLOG("%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g\t%.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
 	//}
 	
 	size_t ni = 0;
@@ -1017,7 +1017,7 @@ bool SignalingNetwork::SolveSystem(NonlinearSystem& system, VectorReal& activiti
 		}
 
 		//if (system.signaling_ix.size() == 12) {
-		//	LOG("%.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
+		//	BCMLOG("%.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
 		//}
 
 		// Update activities vector (this is used in F and Jac calculation)
@@ -1035,12 +1035,12 @@ bool SignalingNetwork::SolveSystem(NonlinearSystem& system, VectorReal& activiti
 		ni++;
 	}
 
-	//LOG("Iterations: %u - %s", ni, converged ? "converged" : "NOT converged");
+	//BCMLOG("Iterations: %u - %s", ni, converged ? "converged" : "NOT converged");
 	//if (system.signaling_ix.size() == 12) {
 	//	if (converged) {
-	//		LOG("%.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
+	//		BCMLOG("%.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g", system.vx(0), system.vx(1), system.vx(2), system.vx(3), system.vx(4), system.vx(5), system.vx(6), system.vx(7), system.vx(8), system.vx(9), system.vx(10), system.vx(11));
 	//	} else {
-	//		LOG("not converged");
+	//		BCMLOG("not converged");
 	//	}
 	//}
 

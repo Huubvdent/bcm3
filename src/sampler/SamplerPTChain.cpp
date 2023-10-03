@@ -129,7 +129,7 @@ namespace bcm3 {
 		// Update variable blocks according to the blocking strategy
 		std::vector< std::vector<ptrdiff_t> > blocks = blocking_strategy->GetBlocks(sample_history, sample_history_clustering);
 		if (log_info) {
-			LOG("Blocking strategy returned %zu block(s)", blocks.size());
+			BCMLOG("Blocking strategy returned %zu block(s)", blocks.size());
 		}
 
 		// Update the proposal for every variable block
@@ -137,7 +137,7 @@ namespace bcm3 {
 		variable_blocks.resize(blocks.size());
 		for (ptrdiff_t i = 0; i < variable_blocks.size(); i++) {
 			if (log_info) {
-				LOG(" Block %zd", i+1);
+				BCMLOG(" Block %zd", i+1);
 			}
 			variable_blocks[i].variable_indices = blocks[i];
 			variable_blocks[i].proposal = CreateProposalInstance(blocks[i], sampler->async[thread].rng);
@@ -371,7 +371,7 @@ namespace bcm3 {
 
 	void SamplerPTChain::LogStatistics() const
 	{
-		LOG("%11.7f | %12.5f | %14.5f",
+		BCMLOG("%11.7f | %12.5f | %14.5f",
 			temperature,
 			accepted_mutate / (Real)attempted_mutate,
 			accepted_exchange / (Real)attempted_exchange);
@@ -379,7 +379,7 @@ namespace bcm3 {
 
 	void SamplerPTChain::LogProposalInfo() const
 	{
-		LOG("Proposal information:");
+		BCMLOG("Proposal information:");
 		for (size_t i = 0; i < variable_blocks.size(); i++) {
 			const Block& b = variable_blocks[i];
 
@@ -388,7 +388,7 @@ namespace bcm3 {
 				ixs += std::string(",") + std::to_string(b.variable_indices[vi]);
 			}
 
-			LOG(" Block %u: %s", i + 1, ixs.c_str());
+			BCMLOG(" Block %u: %s", i + 1, ixs.c_str());
 
 			if (b.proposal) {
 				b.proposal->LogInfo();

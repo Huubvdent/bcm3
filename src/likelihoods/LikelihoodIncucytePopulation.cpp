@@ -361,7 +361,7 @@ bool LikelihoodIncucytePopulation::SimulateWell(size_t threadix, Experiment& e, 
 	
 	solvers[threadix].SetUserData((void*)threadix);
 	bool result = solvers[threadix].Simulate(initial_conditions.data(), e.observed_timepoints, discontinuities_time, output);
-	//LOG("Success: %d; steps: %zu", (int)result, solvers[threadix].GetNumStepsTaken());
+	//BCMLOG("Success: %d; steps: %zu", (int)result, solvers[threadix].GetNumStepsTaken());
 	if (result) {
 		const Real cell_preadherence_size = values[varset->GetVariableIndex("cell_preadherence_size")];
 		const Real cell_size_decrease_time = values[varset->GetVariableIndex("cell_adherence_time")];

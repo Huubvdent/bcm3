@@ -318,11 +318,11 @@ bool LikelihoodPopPKTrajectory::EvaluateLogProbability(size_t threadix, const Ve
 		Real patient_logllh = 0.0;
 		if (!solvers[threadix]->Simulate(initial_conditions, time, pd.simulated_trajectories)) {
 #if 0
-			LOG("Patient %u failed", j);
-			LOG(" k_absorption: %g", pd.k_absorption);
-			LOG(" k_excretion: %g", pd.k_excretion);
-			LOG(" k_vod: %g", pd.k_vod);
-			LOG(" k_elimination: %g", pd.k_elimination);
+			BCMLOG("Patient %u failed", j);
+			BCMLOG(" k_absorption: %g", pd.k_absorption);
+			BCMLOG(" k_excretion: %g", pd.k_excretion);
+			BCMLOG(" k_vod: %g", pd.k_vod);
+			BCMLOG(" k_elimination: %g", pd.k_elimination);
 #endif
 			patient_logllh = -std::numeric_limits<Real>::infinity();
 		} else {

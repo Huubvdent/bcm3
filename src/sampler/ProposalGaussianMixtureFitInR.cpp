@@ -57,7 +57,7 @@ namespace bcm3 {
 		} else {
 			NetCDFBundler bundler;
 
-			LOG("Writing history to %s", tmpfilename.c_str());
+			BCMLOG("Writing history to %s", tmpfilename.c_str());
 
 			if (boost::filesystem::exists(tmpfilename)) {
 				boost::filesystem::remove(tmpfilename);
@@ -90,7 +90,7 @@ namespace bcm3 {
 			if (log_info) {
 				cmd += std::string(" log_info");
 			}
-			LOG("Calling R fitting script using: \"%s\"", cmd.c_str());
+			BCMLOG("Calling R fitting script using: \"%s\"", cmd.c_str());
 			int result = boost::process::system(cmd);
 
 			if (result != 0) {

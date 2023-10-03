@@ -122,7 +122,7 @@ bool ODESolverDP5::Simulate(const OdeReal* initial_conditions, const OdeVectorRe
 			}
 
 			if (verbose) {
-				LOG("t=%g - dt=%g maxdiff=%g dctime=%g%s", t, cur_dt, maxdiff, discontinuity_time, approaching_discontinuity ? " approaching dc" : "");
+				BCMLOG("t=%g - dt=%g maxdiff=%g dctime=%g%s", t, cur_dt, maxdiff, discontinuity_time, approaching_discontinuity ? " approaching dc" : "");
 			}
 
 			// From Hairer I; section II.4, p167

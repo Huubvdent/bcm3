@@ -126,9 +126,9 @@ namespace bcm3 {
 
 	void ProposalClusteredCovariance::LogInfo() const
 	{
-		LOG("  Clustered covariance proposal with %u components", gmm->GetNumComponents());
+		BCMLOG("  Clustered covariance proposal with %u components", gmm->GetNumComponents());
 		for (ptrdiff_t i = 0; i < gmm->GetNumComponents(); i++) {
-			LOG("   Component %u; scale=%8.5f, weight=%8.5f, condition number=%6g", i + 1, scales(i), gmm->GetWeights()(i), 1.0 / gmm->GetCovarianceDecomp(i).rcond());
+			BCMLOG("   Component %u; scale=%8.5f, weight=%8.5f, condition number=%6g", i + 1, scales(i), gmm->GetWeights()(i), 1.0 / gmm->GetCovarianceDecomp(i).rcond());
 		}
 	}
 
@@ -209,7 +209,7 @@ namespace bcm3 {
 				covs[ci].diagonal().array() += 1e-8;
 
 				if (log_info) {
-					LOG("  Cluster %zd based on %zu samples; using %zu samples for covariance estimation", ci, sample_history_clustering->GetSamplesFromCluster(ci).size(), sample_ix.size());
+					BCMLOG("  Cluster %zd based on %zu samples; using %zu samples for covariance estimation", ci, sample_history_clustering->GetSamplesFromCluster(ci).size(), sample_ix.size());
 				}
 
 				if (!is_positive_semi_definite(covs[ci])) {

@@ -187,7 +187,7 @@ bool CVODESolverDelay::Simulate(const Real* initial_conditions, const VectorReal
 
 		int result = CVode(cvode_mem, (OdeReal)timepoints[tpi], (N_Vector)y, &tret, CV_ONE_STEP);
 		if (debug_log) {
-			LOG("%6g - %g - %.12g %.12g %.12g", timepoints[tpi], tret, NV_Ith_S(y, 0), NV_Ith_S(y, 1), NV_Ith_S(y, 2));
+			BCMLOG("%6g - %g - %.12g %.12g %.12g", timepoints[tpi], tret, NV_Ith_S(y, 0), NV_Ith_S(y, 1), NV_Ith_S(y, 2));
 		}
 		if (result == CV_TSTOP_RETURN) {
 			// We've met a discontinuity

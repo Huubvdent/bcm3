@@ -370,12 +370,12 @@ bool Experiment::Load(const boost::property_tree::ptree& xml_node, const boost::
 					size_t inactive_species = GetCVodeSpeciesByName("inactive_" + name_var.substr(6));
 
 					if(active_species == std::numeric_limits<size_t>::max()){
-						LOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding active species \"active_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
+						BCMLOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding active species \"active_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
 						return false;
 					}
 
 					if(inactive_species == std::numeric_limits<size_t>::max()){
-						LOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding inactive species \"inactive_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
+						BCMLOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding inactive species \"inactive_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
 						return false;
 					}
 
@@ -389,12 +389,12 @@ bool Experiment::Load(const boost::property_tree::ptree& xml_node, const boost::
 				size_t inactive_species = GetCVodeSpeciesByName("inactive_" + name_var.substr(6));
 
 				if(active_species == std::numeric_limits<size_t>::max()){
-					LOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding active species \"active_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
+					BCMLOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding active species \"active_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
 					return false;
 				}
 
 				if(inactive_species == std::numeric_limits<size_t>::max()){
-					LOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding inactive species \"inactive_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
+					BCMLOG("The ratio variable \"%s\" has been specified; \"ratio_\" variables are used to describe ratios of initial conditions for two species; but the corresponding inactive species \"inactive_%s\" is not found in the model.", name_var.c_str(), name_var.substr(6).c_str());
 					return false;
 				}
 
@@ -517,7 +517,7 @@ bool Experiment::Load(const boost::property_tree::ptree& xml_node, const boost::
 		}
 #endif
 	} else {
-		LOG("No data file specified - adding fixed timepoints to simulate model");
+		BCMLOG("No data file specified - adding fixed timepoints to simulate model");
 		for (int i = 0; i < 2; i++) {
 			SimulationTimepoints st;
 			st.data_likelihood_ix = std::numeric_limits<size_t>::max();
@@ -633,14 +633,14 @@ bool Experiment::GenerateAndCompileSolverCode(const std::string& codegen_name)
 		jacobian = (jacobian_fn)dlsym(derivative_dll, "generated_jacobian");
 #endif
 		if (!derivative || !jacobian) {
-			LOG("Unable to find generated derivative or jacobian in the dll, recompiling derivative");
+			BCMLOG("Unable to find generated derivative or jacobian in the dll, recompiling derivative");
 			printf("Unable to find generated derivative or jacobian in the dll, recompiling...\n");
 		} else {
-			LOG("Found DLL with derivative function, reusing it.");
+			BCMLOG("Found DLL with derivative function, reusing it.");
 			return true;
 		}
 	} else {
-		LOG("Can't find dll with derivative functions for experiment \"%s\", generating and compiling derivative code.", Name.c_str());
+		BCMLOG("Can't find dll with derivative functions for experiment \"%s\", generating and compiling derivative code.", Name.c_str());
 		printf("Can't find dll with derivative functions for experiment \"%s\", generating and compiling derivative code...\n", Name.c_str());
 	}
 
@@ -881,7 +881,7 @@ bool Experiment::GenerateAndCompileSolverCode(const std::string& codegen_name)
 	}
 
 	// Compile
-	LOG("Compiling generated code...");
+	BCMLOG("Compiling generated code...");
 	try {
 #if PLATFORM_WINDOWS
 		// HACKY - assume only one of these is installed and that it's the same one used to compile BCM...
@@ -1129,7 +1129,7 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	if (active_cells == max_number_of_cells) {
 		// TODO - what to do? Fail the simulation or just continue?
 		// We'll fail the simulation for now; as it probably indicates the apparent growth rate is too big, at least if the max simulation size was chosen appropriately.
-		//LOG("Max number of cells reached\n");
+		//BCMLOG("Max number of cells reached\n");
 		return std::numeric_limits<size_t>::max();
 	}
 

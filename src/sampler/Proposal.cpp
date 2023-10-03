@@ -78,13 +78,13 @@ namespace bcm3 {
 
 		MatrixReal history = sample_history.GetHistory(variable_indices);
 		if (log_info) {
-			LOG("  Proposal adaptation - history samples: %zd", history.rows());
+			BCMLOG("  Proposal adaptation - history samples: %zd", history.rows());
 		}
 
 		// If necessary, reduce the history size to the maximum number of samples specified in the configuration
 		if (history.rows() > max_history_samples) {
 			if (log_info) {
-				LOG("Proposal adaptation - downsampling to %zu samples", max_history_samples);
+				BCMLOG("Proposal adaptation - downsampling to %zu samples", max_history_samples);
 			}
 
 			std::vector<ptrdiff_t> use_sample_ix;

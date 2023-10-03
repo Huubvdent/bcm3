@@ -195,7 +195,7 @@ bool fISAExperimentSingleCondition::EvaluateCellLine(void* cell_line_ix_as_ptr, 
 	pd.multisolve_logp.setZero();
 
 	for (size_t mi = 0; mi < network->GetMultirootSolveCount(); mi++) {
-//		LOG("Experiment %s - cell line %u - solve %u - MTORC2 activity=%g; AKT_S473 activity=%g, PI3K activity=%g, IRS1 activity=%g", Name.c_str(), cell_line_ix, mi,
+//		BCMLOG("Experiment %s - cell line %u - solve %u - MTORC2 activity=%g; AKT_S473 activity=%g, PI3K activity=%g, IRS1 activity=%g", Name.c_str(), cell_line_ix, mi,
 //			pd.multi_activities[mi](network->GetSignalingMoleculeIxByName("MTORC2")),
 //			pd.multi_activities[mi](network->GetSignalingMoleculeIxByName("AKT_S473")),
 //			pd.multi_activities[mi](network->GetSignalingMoleculeIxByName("IRS1")),
@@ -415,9 +415,9 @@ bool fISAExperimentSingleCondition::EvaluateCellLine(void* cell_line_ix_as_ptr, 
 	if (bestp == -std::numeric_limits<Real>::infinity()) {
 		cell_line_logp(cell_line_ix) = -std::numeric_limits<Real>::infinity();
 	} else {
-		//LOG("best_ix = %d, %.15g, %.15g", best_ix, cell_line_p(0), bestp);
+		//BCMLOG("best_ix = %d, %.15g, %.15g", best_ix, cell_line_p(0), bestp);
 		//for (int i = 0; i < network->GetMoleculeCount(); i++) {
-		//	LOG("%g\t%g", parallel_data[threadix].multi_activities[cell_line_ix][0][i], parallel_data[threadix].multi_activities[cell_line_ix][best_ix][i]);
+		//	BCMLOG("%g\t%g", parallel_data[threadix].multi_activities[cell_line_ix][0][i], parallel_data[threadix].multi_activities[cell_line_ix][best_ix][i]);
 		//}
 
 		cell_line_logp(cell_line_ix) = bestp;

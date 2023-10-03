@@ -130,11 +130,11 @@ namespace bcm3 {
 
 			Real varlogp;
 			if (!Variables[i]->EvaluateLogPDF(varlogp, values(i))) {
-				LOG("Error evaluating prior for variable %d", i);
+				BCMLOG("Error evaluating prior for variable %d", i);
 				return false;
 			}
 			if (varlogp != varlogp) {
-				LOG("NaN in evaluating prior for variable %d, value=%g", i, values[i]);
+				BCMLOG("NaN in evaluating prior for variable %d, value=%g", i, values[i]);
 			}
 			logp += varlogp;
 		}

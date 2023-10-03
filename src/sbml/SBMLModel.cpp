@@ -133,9 +133,9 @@ bool SBMLModel::LoadSBML(const std::string& fn)
 		}
 	}
 	if (document->getNumErrors(LIBSBML_SEV_INFO) > 0) {
-		LOG("Information while reading SBML file %s: %d", fn.c_str(), document->getNumErrors(LIBSBML_SEV_INFO));
+		BCMLOG("Information while reading SBML file %s: %d", fn.c_str(), document->getNumErrors(LIBSBML_SEV_INFO));
 		for (unsigned int i = 0; i < document->getNumErrors(LIBSBML_SEV_INFO); i++) {
-			LOG(" Information %d: %s", i + 1, document->getErrorWithSeverity(i, LIBSBML_SEV_INFO)->getMessage().c_str());
+			BCMLOG(" Information %d: %s", i + 1, document->getErrorWithSeverity(i, LIBSBML_SEV_INFO)->getMessage().c_str());
 		}
 	}
 

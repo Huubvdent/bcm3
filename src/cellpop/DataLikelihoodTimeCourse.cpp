@@ -490,7 +490,7 @@ bool DataLikelihoodTimeCourse::Evaluate(const VectorReal& values, const VectorRe
 			}
 			out += "\n";
 		}
-		//LOG(out.c_str());
+		//BCMLOG(out.c_str());
 
 		MatrixReal matching;
 		if (!HungarianMatching(cell_likelihoods, matching, HUNGARIAN_MATCH_MAX)) {

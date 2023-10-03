@@ -120,11 +120,11 @@ void Logger::Log(ELevel level, const char* source, int line, const char* message
 void Logger::LogTime()
 {
 	boost::posix_time::ptime time = boost::date_time::second_clock<boost::posix_time::ptime>::local_time();
-	LOG("Current date: %04u-%02u-%02u",
+	BCMLOG("Current date: %04u-%02u-%02u",
 			(unsigned int)time.date().year(),
 			(unsigned int)time.date().month(),
 			(unsigned int)time.date().day());
-	LOG("Current time: %02u:%02u:%02u",
+	BCMLOG("Current time: %02u:%02u:%02u",
 			(unsigned int)time.time_of_day().hours(),
 			(unsigned int)time.time_of_day().minutes(),
 			(unsigned int)time.time_of_day().seconds());
@@ -140,13 +140,13 @@ void Logger::LogCPUInfo()
 			size_t newline = strlen(buf)-1;
 			buf[newline] = 0;
 			if (strstr(buf, "model name") != NULL) {
-				LOG(buf);
+				BCMLOG(buf);
 			}
 		}
 		fclose(file);
 	}
 #else
-	LOG("(Only implemented on Linux)");
+	BCMLOG("(Only implemented on Linux)");
 #endif
 }
 
