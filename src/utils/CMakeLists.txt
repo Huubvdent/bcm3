@@ -50,6 +50,7 @@ target_link_libraries(utils
     Eigen
     Boost::headers
     ${Boost_LIBRARIES}
+    ${TORCH_LIBRARIES}
     Threads::Threads
   PRIVATE
     ${NETCDF_LIBRARIES}

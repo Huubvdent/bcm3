@@ -30,7 +30,6 @@ target_link_libraries(cellpop
     utils
     sbml
     ${CMAKE_DL_LIBS}
-    ${TORCH_LIBRARIES}
   PRIVATE
     hungarian_matching
     odecommon
