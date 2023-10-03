@@ -12,7 +12,7 @@ struct VarEncoder : torch::nn::Module
         fc4(register_module("fc4", torch::nn::Linear(6, 2)))
     {}
 
-    torch::Tensor forward(torch::Tensor x, torch::Tensor sobol_tensor) 
+    at::Tensor forward(at::Tensor x, at::Tensor sobol_tensor) 
     {
         x = torch::relu(fc1->forward(x));
         x = torch::relu(fc2->forward(x));
@@ -23,7 +23,7 @@ struct VarEncoder : torch::nn::Module
         return z;
     }
 
-    void load_weights(torch::Tensor encoder_1_weight, torch::Tensor encoder_2_weight, torch::Tensor encoder_3_weight, torch::Tensor encoder_4_weight, torch::Tensor encoder_1_bias, torch::Tensor encoder_2_bias, torch::Tensor encoder_3_bias, torch::Tensor encoder_4_bias)
+    void load_weights(at::Tensor encoder_1_weight, at::Tensor encoder_2_weight, at::Tensor encoder_3_weight, at::Tensor encoder_4_weight, at::Tensor encoder_1_bias, at::Tensor encoder_2_bias, at::Tensor encoder_3_bias, at::Tensor encoder_4_bias)
     {
         fc1->weight = encoder_1_weight;
         fc2->weight = encoder_2_weight;
@@ -47,7 +47,7 @@ struct Decoder : torch::nn::Module {
           fc3(register_module("fc3", torch::nn::Linear(10, 13)))
     {}
 
-    torch::Tensor forward(torch::Tensor x) 
+    at::Tensor forward(at::Tensor x) 
     {
         x = torch::relu(fc1->forward(x));
         x = torch::relu(fc2->forward(x));
@@ -55,7 +55,7 @@ struct Decoder : torch::nn::Module {
         return x;
     }
 
-    void load_weights(torch::Tensor decoder_1_weight, torch::Tensor decoder_2_weight, torch::Tensor decoder_3_weight, torch::Tensor decoder_1_bias, torch::Tensor decoder_2_bias, torch::Tensor decoder_3_bias)
+    void load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_weight, at::Tensor decoder_3_weight, at::Tensor decoder_1_bias, at::Tensor decoder_2_bias, at::Tensor decoder_3_bias)
     {
         fc1->weight = decoder_1_weight;
         fc2->weight = decoder_2_weight;
