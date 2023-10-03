@@ -252,7 +252,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(double)*input_tensor.numel());
 
 	//Create sobol sequence tensor as input for encoder
-	sobol_seq = *sobol_sequence_values;
+	VectorReal sobol_seq = *sobol_sequence_values;
 
 	std::vector<double> sobol_copy;
 	for(size_t i = 0; i < 2; i++){
@@ -265,15 +265,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(double)*sobol_tensor.numel());
 
-
-
-
-
 	// Z-scale tensor
 	input_tensor = (input_tensor - mean) / std;
 
-	torch::Tensor latent = *encoder->forward(input_tensor, sobol_tensor);
-	torch::Tensor output = *decoder->forward(latent);
+	torch::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+	torch::Tensor output = decoder->forward(latent);
 
 	// Rescale output
 	output = (output * std) + mean;
