@@ -6,6 +6,7 @@
 struct VarEncoder : torch::nn::Module {
     VarEncoder () {};
     torch::Tensor forward(torch::Tensor x, torch::Tensor sobol_tensor);
+    void load_weights(torch::Tensor encoder_1_weight, torch::Tensor encoder_2_weight, torch::Tensor encoder_3_weight, torch::Tensor encoder_4_weight, torch::Tensor encoder_1_bias, torch::Tensor encoder_2_bias, torch::Tensor encoder_3_bias, torch::Tensor encoder_4_bias){};
     torch::nn::Linear fc1;
     torch::nn::Linear fc2;
     torch::nn::Linear fc3;
@@ -14,7 +15,8 @@ struct VarEncoder : torch::nn::Module {
 
 struct Decoder : torch::nn::Module {
     Decoder () {};
-    torch::Tensor forward(torch::Tensor x, torch::Tensor sobol_tensor) {};
+    torch::Tensor forward(torch::Tensor x, torch::Tensor sobol_tensor){};
+    void load_weights(torch::Tensor decoder_1_weight, torch::Tensor decoder_2_weight, torch::Tensor decoder_3_weight, torch::Tensor decoder_1_bias, torch::Tensor decoder_2_bias, torch::Tensor decoder_3_bias){};
     torch::nn::Linear fc1;
     torch::nn::Linear fc2;
     torch::nn::Linear fc3;

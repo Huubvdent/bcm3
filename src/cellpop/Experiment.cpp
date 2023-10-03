@@ -1193,14 +1193,29 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	torch::Tensor mean = container.attr("mean").toTensor();
 	torch::Tensor std = container.attr("std").toTensor();
 
-	encoder->load_state_dict(container.attr("encoder"));
-	decoder->load_state_dict(container.attr("decoder"));
+	torch::Tensor encoder_1_weight = container.attr("encoder_1_weight").toTensor();
+	torch::Tensor encoder_2_weight = container.attr("encoder_2_weight").toTensor();
+	torch::Tensor encoder_3_weight = container.attr("encoder_3_weight").toTensor();
+	torch::Tensor encoder_4_weight = container.attr("encoder_4_weight").toTensor();
+
+	torch::Tensor encoder_1_bias = container.attr("encoder_1_weight").toTensor();
+	torch::Tensor encoder_2_bias = container.attr("encoder_2_weight").toTensor();
+	torch::Tensor encoder_3_bias = container.attr("encoder_3_weight").toTensor();
+	torch::Tensor encoder_4_bias = container.attr("encoder_4_weight").toTensor();
+
+	torch::Tensor decoder_1_weight = container.attr("decoder_1_bias").toTensor();
+	torch::Tensor decoder_2_weight = container.attr("decoder_2_bias").toTensor();
+	torch::Tensor decoder_3_weight = container.attr("decoder_3_bias").toTensor();
+
+	torch::Tensor decoder_1_bias = container.attr("decoder_1_bias").toTensor();
+	torch::Tensor decoder_2_bias = container.attr("decoder_2_bias").toTensor();
+	torch::Tensor decoder_3_bias = container.attr("decoder_3_bias").toTensor();
+
+	encoder->load_weights(encoder_1_weight, encoder_2_weight, encoder_3_weight, encoder_4_weight, encoder_1_bias, encoder_2_bias, encoder_3_bias, encoder_4_bias);
+	decoder->load_weights(decoder_1_weight, decoder_2_weight, decoder_3_weight, decoder_1_bias, decoder_2_bias, decoder_3_bias);
 
 	encoder->eval();
 	decoder->eval();
-
-	encoder->no_grad();
-	decoder->no_grad();
 #endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, mean, std);
