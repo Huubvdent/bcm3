@@ -223,16 +223,13 @@ bool Cell::SetInitialConditionsFromOtherCell(const Cell* other)
 	return true;
 }
 
-bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol)
+bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::make_shared<VarEncoder> encoder, std::make_shared<Decoder> decoder, torch::Tensor mean, torch::Tensor std)
 {
 	cvode_steps = 0;
 	cvode_timepoint_iter = 0;
 
 	int sobol_sequence_ix = 0;
-	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
-		(*it)->ApplyVariabilityEntryTime(creation_time, *sobol_sequence_values, sobol_sequence_ix, transformed_variables, experiment->non_sampled_parameters, is_initial_cell);
-	}
-	this->creation_time = creation_time;
+	
 
 #if 1
 	//VAE mode
@@ -249,36 +246,33 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	auto input_tensor = torch::zeros(n,torch::kDouble);
 
-	const void* voidPtr = static_cast<const void*>(variable_copy.data());
+	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 
-	std::memcpy(input_tensor.data_ptr(),voidPtr,sizeof(double)*input_tensor.numel());
+	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(double)*input_tensor.numel());
 
-	// Load mean and standard devation from memory
-	torch::jit::script::Module container = torch::jit::load("container.pt");
+	//Create sobol sequence tensor as input for encoder
+	sobol_seq = *sobol_sequence_values;
 
-	torch::Tensor mean = container.attr("mean").toTensor();
-	torch::Tensor std = container.attr("std").toTensor();
-	
+	std::vector<double> sobol_copy;
+	for(size_t i = 0; i < 2; i++){
+		sobol_copy.push_back(sobol_seq[i]);
+	}
+
+	auto sobol_tensor = torch::zeros(2,torch::kDouble);
+
+	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
+
+	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(double)*sobol_tensor.numel());
+
+
+
+
+
 	// Z-scale tensor
 	input_tensor = (input_tensor - mean) / std;
 
-	//Create input for jit pytorch model
-	std::vector<torch::jit::IValue> inputs;
-	inputs.push_back(input_tensor);
-
-	// Load pretrained model from memory
-	torch::jit::script::Module module;
-	try {
-		// Deserialize the ScriptModule from a file using torch::jit::load().
-		module = torch::jit::load("/Users/huubvdent/Documents/Internship/cellpop_RUNS/KRAS_no_treatment/vae_runs/v12_10/traced_vae.zip");
-	}
-	catch (const c10::Error& e) {
-		std::cerr << "error loading the model\n";
-		return -1;
-	}
-
-	// Execute the model and turn its output into a tensor.
-	torch::Tensor output = module.forward(inputs).toTensor();
+	torch::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+	torch::Tensor output = decoder->forward(latent);
 
 	// Rescale output
 	output = (output * std) + mean;
@@ -291,9 +285,17 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	VectorReal vae_variables(n);
 
 	for(size_t j = 0; j < n; j++){
-		vae_variables[j] = result_vector[j];
+		cell_specified_transformed_variables[j] = result_vector[j];
 	}
+
+	this->creation_time = result_vector[entry_time_ix]
 #endif
+
+#if 0
+	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
+		(*it)->ApplyVariabilityEntryTime(creation_time, *sobol_sequence_values, sobol_sequence_ix, transformed_variables, experiment->non_sampled_parameters, is_initial_cell);
+	}
+	this->creation_time = creation_time;
 
 	for (size_t i = 0; i < cell_specific_transformed_variables.size(); i++) {
 		cell_specific_transformed_variables(i) = vae_variables(i);
@@ -307,13 +309,14 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
 			(*it)->ApplyVariabilityParameter(experiment->non_sampled_parameter_names[i], cell_specific_non_sampled_transformed_variables(i), *sobol_sequence_values, sobol_sequence_ix, vae_variables, experiment->non_sampled_parameters, is_initial_cell);
 		}
-	}
+	}	
 
 	for (size_t i = 0; i < model->GetNumCVodeSpecies(); i++) {
 		for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
 			(*it)->ApplyVariabilitySpecies(model->GetCVodeSpeciesName(i), NV_Ith_S(cvode_y, i), *sobol_sequence_values, sobol_sequence_ix, vae_variables, experiment->non_sampled_parameters, is_initial_cell);
 		}
 	}
+#endif
 
 	completed = false;
 	replication_start_time = std::numeric_limits<Real>::quiet_NaN();

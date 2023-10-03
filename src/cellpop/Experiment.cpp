@@ -564,7 +564,7 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 	}
 
 	transformed_variables.setConstant(varset->GetNumVariables(), std::numeric_limits<Real>::quiet_NaN());
-
+#if 0
 	if (cell_variabilities.size() > 0) {
 		sobol_sequence = std::make_shared< boost::random::sobol >(cell_variabilities.size());
 		sobol_sequence_values.resize(initial_number_of_cells * 100);
@@ -577,6 +577,21 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 		}
 		sobol_sequence_indices.resize(max_number_of_cells, std::numeric_limits<size_t>::max());
 	}
+#endif
+
+#if 1
+	// Temporary for autoencoder
+	sobol_sequence = std::make_shared<boost::random::sobol>(2);
+	sobol_sequence_values.resize(initial_number_of_cells * 100);
+	boost::random::uniform_01<Real> unif;
+	for (int i = 0; i < sobol_sequence_values.size(); i++) {
+		sobol_sequence_values[i].resize(cell_variabilities.size());
+		for (int j = 0; j < cell_variabilities.size(); j++) {
+			sobol_sequence_values[i](j) = unif(*sobol_sequence);
+		}
+	}
+	sobol_sequence_indices.resize(max_number_of_cells, std::numeric_limits<size_t>::max());
+#endif
 
 	return true;
 }
@@ -1164,7 +1179,30 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	if (!sobol_sequence_values.empty()) {
 		sobol_sequence_indices[new_cell_ix] = sobol_sequence_ix;
 	}
-	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol);
+
+#if 1
+	// Instantiate VAE
+	auto encoder = std::make_shared<VarEncoder>();
+	
+	auto decoder = std::make_shared<Decoder>();
+
+	//load the weight here!!
+	torch::jit::script::Module container = torch::jit::load("container.pt");
+
+	torch::Tensor mean = container.attr("mean").toTensor();
+	torch::Tensor std = container.attr("std").toTensor();
+
+	encoder.load_state_dict(container.attr("encoder"));
+	decoder.load_state_dict(container.attr("decoder"));
+
+	encoder.eval();
+	decoder.eval();
+
+	encoder.no_grad();
+	decoder.no_grad();
+#endif
+
+	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, VarEncoder, Decoder, mean, std);
 
 	if (!result) {
 		return std::numeric_limits<size_t>::max();
