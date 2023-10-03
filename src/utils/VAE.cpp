@@ -1,8 +1,9 @@
 #include "VAE.h"
 
 #include <torch/script.h>
+#include <torch/torch.h>
 
-struct VarEncoder : torch::jit::nn::Module {
+struct VarEncoder : torch::nn::Module {
     VarEncoder () {
         fc1 = register_module("fc1", torch::nn::Linear(13, 10));
         fc2 = register_module("fc2", torch::nn::Linear(10, 6));
@@ -20,11 +21,11 @@ struct VarEncoder : torch::jit::nn::Module {
         return z;
     }
 
-    torch::jit::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 
 };
 
-struct Decoder : torch::jit::nn::Module {
+struct Decoder : torch::nn::Module {
     Decoder () {
         fc1 = register_module("fc1", torch::nn::Linear(2, 6));
         fc2 = register_module("fc2", torch::nn::Linear(6, 10));
@@ -38,6 +39,6 @@ struct Decoder : torch::jit::nn::Module {
         return x;
     }
 
-    torch::jit::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
+    torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
 
 };
