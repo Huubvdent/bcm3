@@ -268,8 +268,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Z-scale tensor
 	input_tensor = (input_tensor - mean) / std;
 
-	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
-	at::Tensor output = decoder->forward(latent);
+	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor).toTensor();
+	at::Tensor output = decoder->forward(latent).toTensor();
 
 	// Rescale output
 	output = (output * std) + mean;
@@ -282,7 +282,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	VectorReal vae_variables(n);
 
 	for(size_t j = 0; j < n; j++){
-		cell_specified_transformed_variables[j] = result_vector[j];
+		cell_specific_transformed_variables[j] = result_vector[j];
 	}
 
 	this->creation_time = result_vector[entry_time_ix];
