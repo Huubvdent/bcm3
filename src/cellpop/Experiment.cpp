@@ -1218,6 +1218,8 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 
 	encoder->eval();
 	decoder->eval();
+
+	BCMLOG("eval mode");
 #endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, mean, std);

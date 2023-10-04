@@ -230,6 +230,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	cvode_timepoint_iter = 0;
 
 	int sobol_sequence_ix = 0;
+
+	BCMLOG("start of cell initialize");
 	
 
 #if 1
