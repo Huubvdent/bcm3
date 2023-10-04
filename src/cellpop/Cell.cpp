@@ -256,7 +256,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
-	input_tensor = input_tensor.transpose(0, 1);
+	input_tensor = input_tensor.reshape({1, 13});
 
 	BCMLOG("second");
 
