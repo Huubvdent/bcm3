@@ -11,10 +11,10 @@ VarEncoder::VarEncoder ()
 
 at::Tensor VarEncoder::forward(at::Tensor x, at::Tensor sobol_tensor) 
 {
-    x = torch::relu(fc1->forward(x));
-    x = torch::relu(fc2->forward(x));
-    at::Tensor mu = torch::relu(fc3->forward(x));
-    at::Tensor sigma = torch::relu(fc4->forward(x));
+    at::Tensor first = torch::relu(fc1->forward(x));
+    at::Tensor second = torch::relu(fc2->forward(first));
+    at::Tensor mu = torch::relu(fc3->forward(second));
+    at::Tensor sigma = torch::relu(fc4->forward(second));
     // Use sobol sequence to sample deterministically
     at::Tensor z = mu + sigma * sobol_tensor;
     return z;
@@ -43,10 +43,10 @@ Decoder::Decoder ()
 
 at::Tensor Decoder::forward(at::Tensor x) 
 {
-    x = torch::relu(fc1->forward(x));
-    x = torch::relu(fc2->forward(x));
-    x = torch::sigmoid(fc3->forward(x));
-    return x;
+    at::Tensor first = torch::relu(fc1->forward(x));
+    at::Tensor second = torch::relu(fc2->forward(first));
+    at:Tensor last = torch::sigmoid(fc3->forward(second));
+    return last;
 }
 
 void Decoder::load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_weight, at::Tensor decoder_3_weight, at::Tensor decoder_1_bias, at::Tensor decoder_2_bias, at::Tensor decoder_3_bias)
