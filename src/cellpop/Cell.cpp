@@ -267,10 +267,12 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	BCMLOG("4");
 
 	if (sobol_sequence_values != nullptr && 0 < sobol_sequence_values->rows()) {
-    	double element = (*sobol_sequence_values)(0, 0);
+    	double first = (*sobol_sequence_values)(0, 0);
 	} else {
 		BCMLOG("issue")
 	}
+
+	double first = 0.0;
 
 	BCMLOG("5");
 	double second = (*sobol_sequence_values)(1, 0);
