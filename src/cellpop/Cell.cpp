@@ -224,7 +224,7 @@ bool Cell::SetInitialConditionsFromOtherCell(const Cell* other)
 	return true;
 }
 
-bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<VarEncoder> encoder, std::shared_ptr<Decoder> decoder, at::Tensor mean, at::Tensor std)
+bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<bcm3::VarEncoder> encoder, std::shared_ptr<bcm3::Decoder> decoder, at::Tensor mean, at::Tensor std)
 {
 	cvode_steps = 0;
 	cvode_timepoint_iter = 0;
