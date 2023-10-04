@@ -11,18 +11,12 @@ VarEncoder::VarEncoder ()
 
 at::Tensor VarEncoder::forward(at::Tensor x, at::Tensor sobol_tensor) 
 {
-    BCMLOG("1");
     at::Tensor first = torch::relu(fc1->forward(x));
-    BCMLOG("2");
     at::Tensor second = torch::relu(fc2->forward(first));
-    BCMLOG("3");
     at::Tensor mu = torch::relu(fc3->forward(second));
-    BCMLOG("4");
     at::Tensor sigma = torch::relu(fc4->forward(second));
-    BCMLOG("5");
     // Use sobol sequence to sample deterministically
     at::Tensor z = mu + sigma * sobol_tensor;
-    BCMLOG("6");
     return z;
 }
 
@@ -51,7 +45,7 @@ at::Tensor Decoder::forward(at::Tensor x)
 {
     at::Tensor first = torch::relu(fc1->forward(x));
     at::Tensor second = torch::relu(fc2->forward(first));
-    return torch::sigmoid(fc3->forward(second));
+    at::Tensor third = torch::sigmoid(fc3->forward(second));
 }
 
 void Decoder::load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_weight, at::Tensor decoder_3_weight, at::Tensor decoder_1_bias, at::Tensor decoder_2_bias, at::Tensor decoder_3_bias)
