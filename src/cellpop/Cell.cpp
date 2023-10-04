@@ -268,28 +268,9 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Z-scale tensor
 	input_tensor = (input_tensor - min) / (max - min);
 
-	// Get the sizes of all dimensions
-    c10::IntArrayRef sizes = input_tensor.sizes();
-
-    // Log the sizes of all dimensions
-    std::string logMessage = "Tensor Sizes: ";
-    for (size_t i = 0; i < sizes.size(); ++i) {
-        logMessage += std::to_string(sizes[i]);
-        if (i < sizes.size() - 1) {
-            logMessage += "x";
-        }
-    }
-
-    // Call the LOG() function to print the sizes
-    BCMLOG(logMessage.c_str());
-
 	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
 
-	BCMLOG("latent");
-
 	at::Tensor output = decoder->forward(latent);
-
-	BCMLOG("output");
 
 	// Rescale output
 	output = output * (max - min) + min;
