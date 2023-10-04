@@ -242,18 +242,18 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	//Convert C++ vector to pytorch tensor
 	int n = transformed_variables.size();
 
-	std::vector<double> variable_copy;
+	std::vector<float> variable_copy;
 	for(size_t i = 0; i < n; i++){
-		variable_copy.push_back(transformed_variables[i]);
+		variable_copy.push_back((float) transformed_variables[i]);
 	}
 
 	BCMLOG("first");
 
-	auto input_tensor = torch::zeros(n,torch::kDouble);
+	auto input_tensor = torch::zeros(n,torch::kFloat32);
 
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 
-	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(double)*input_tensor.numel());
+	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
 	BCMLOG("second");
 
@@ -265,19 +265,20 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
 	BCMLOG("4");
-	std::vector<double> sobol_copy;
+	
+	std::vector<float> sobol_copy;
 	for(size_t i = 0; i < n; i++){
-		sobol_copy.push_back(sobol_sequence[i]);
+		sobol_copy.push_back((float) sobol_sequence[i]);
 	}
 
 	BCMLOG("fourth");
-	auto sobol_tensor = torch::zeros(2,torch::kDouble);
+	auto sobol_tensor = torch::zeros(2,torch::kFloat32);
 
 	BCMLOG("5");
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
 
 	BCMLOG("6");
-	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(double)*sobol_tensor.numel());
+	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
 	BCMLOG("7");
 	// Z-scale tensor
@@ -299,15 +300,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Create C++ output vector
 	output = output.contiguous();
 
-	std::vector<double> result_vector(output.data_ptr<double>(), output.data_ptr<double>() + output.numel());
+	std::vector<float> result_vector(output.data_ptr<float>(), output.data_ptr<float>() + output.numel());
 
-	VectorReal vae_variables(n);
-
-	for(size_t j = 0; j < n; j++){
-		cell_specific_transformed_variables[j] = result_vector[j];
+	for(size_t j = 0; j < (n - 1); j++){
+		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
 
-	this->creation_time = result_vector[entry_time_ix];
+	this->creation_time = (double) result_vector[entry_time_ix];
 #endif
 
 #if 0
