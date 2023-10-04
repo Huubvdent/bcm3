@@ -285,8 +285,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Z-scale tensor
 	input_tensor = (input_tensor - min) / (max - min);
 
-	input_tensor = input_tensor.transpose(0, 1);
-
 	BCMLOG("scaled");
 
 	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
