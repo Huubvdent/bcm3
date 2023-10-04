@@ -266,7 +266,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	Real first = sobol_seq[0];
 
-	cout << first;
+	std::cout << first;
 
 	Real second = sobol_seq[1];
 
