@@ -276,7 +276,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	at::Tensor output = decoder->forward(latent);
 
-	BCMLOG("output")
+	BCMLOG("output");
 
 	// Rescale output
 	output = (output * std) + mean;
