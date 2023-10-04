@@ -264,28 +264,23 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::vector<double> sobol_copy;
 
-	Real first = sobol_seq[0];
-	sobol_copy.push_back(first);
+	Real first = sobol_seq(0);
+	Real second = sobol_seq(1);
 
-	Real second = sobol_seq[1];
+	BCMLOG("accessed sobol seq");
+	sobol_copy.push_back(first);
 	sobol_copy.push_back(second);
 
 	BCMLOG("fourth");
-
 	auto sobol_tensor = torch::zeros(2,torch::kDouble);
 
 	BCMLOG("5");
-
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
 
 	BCMLOG("6");
-
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(double)*sobol_tensor.numel());
 
 	BCMLOG("7");
-
-	
-
 	// Z-scale tensor
 	input_tensor = (input_tensor - mean) / std;
 
