@@ -46,6 +46,7 @@ at::Tensor Decoder::forward(at::Tensor x)
     at::Tensor first = torch::relu(fc1->forward(x));
     at::Tensor second = torch::relu(fc2->forward(first));
     at::Tensor third = torch::sigmoid(fc3->forward(second));
+    return third;
 }
 
 void Decoder::load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_weight, at::Tensor decoder_3_weight, at::Tensor decoder_1_bias, at::Tensor decoder_2_bias, at::Tensor decoder_3_bias)
