@@ -266,22 +266,12 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	BCMLOG("4");
 
-	if (sobol_sequence_values != nullptr){
-		BCMLOG("issue null");
+	VectorReal& sobol_sequence = *sobol_sequence_values;
+
+	std::vector<double> variable_copy;
+	for(size_t i = 0; i < n; i++){
+		sobol_copy.push_back(sobol_sequence[i]);
 	}
-
-	if(0 < sobol_sequence_values->rows()){
-		BCMLOG("index");
-	}
-
-	double first = 0.0;
-
-	BCMLOG("5");
-	double second = (*sobol_sequence_values)(1, 0);
-
-	BCMLOG("accessed sobol seq");
-	sobol_copy.push_back(first);
-	sobol_copy.push_back(second);
 
 	BCMLOG("fourth");
 	auto sobol_tensor = torch::zeros(2,torch::kDouble);
