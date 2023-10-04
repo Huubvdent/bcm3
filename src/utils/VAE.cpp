@@ -3,8 +3,8 @@
 namespace bcm3{
 
 VarEncoder::VarEncoder () 
-      : fc1(register_module("fc1", torch::nn::Linear(13, 10))),
-        fc2(register_module("fc2", torch::nn::Linear(10, 6))),
+      : fc1(register_module("fc1", torch::nn::Linear(13, 12))),
+        fc2(register_module("fc2", torch::nn::Linear(12, 6))),
         fc3(register_module("fc3", torch::nn::Linear(6, 2))),
         fc4(register_module("fc4", torch::nn::Linear(6, 2)))
 {}
@@ -37,8 +37,8 @@ void VarEncoder::load_weights(at::Tensor encoder_1_weight, at::Tensor encoder_2_
 
 Decoder::Decoder () 
         : fc1(register_module("fc1", torch::nn::Linear(2, 6))),
-          fc2(register_module("fc2", torch::nn::Linear(6, 10))),
-          fc3(register_module("fc3", torch::nn::Linear(10, 13)))
+          fc2(register_module("fc2", torch::nn::Linear(6, 12))),
+          fc3(register_module("fc3", torch::nn::Linear(12, 13)))
 {}
 
 at::Tensor Decoder::forward(at::Tensor x) 

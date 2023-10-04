@@ -246,7 +246,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::vector<float> variable_copy;
 	for(size_t i = 0; i < n; i++){
 		variable_copy.push_back((float) transformed_variables[i]);
-		BCMLOG("count");
 	}
 
 	BCMLOG("first");
