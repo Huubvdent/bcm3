@@ -1216,6 +1216,9 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 
 	encoder->eval();
 	decoder->eval();
+
+	encoder->no_grad();
+	decoder->no_grad();
 #endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, min, max);
