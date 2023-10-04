@@ -264,8 +264,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::vector<double> sobol_copy;
 
-	Real first = sobol_sequence_values(0);
-	Real second = sobol_sequence_values(1);
+	Real first = (*sobol_sequence_values)[0];
+	Real second = (*sobol_sequence_values)[1];
 
 	BCMLOG("accessed sobol seq");
 	sobol_copy.push_back(first);
