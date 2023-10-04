@@ -43,6 +43,7 @@ target_include_directories(utils
     .
   PRIVATE
     ${NETCDF_INCLUDE_DIR}
+    ${TORCH_INCLUDE_DIR}
 )
 
 target_link_libraries(utils
