@@ -2,8 +2,6 @@
 
 namespace bcm3{
 
-torch::AutoGradMode enable_grad(false);
-
 VarEncoder::VarEncoder () 
       : fc1(register_module("fc1", torch::nn::Linear(13, 12))),
         fc2(register_module("fc2", torch::nn::Linear(12, 6))),

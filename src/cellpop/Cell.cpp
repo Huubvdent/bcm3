@@ -236,8 +236,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	//VAE mode
 	//load VAE model from python
 
-	torch::AutoGradMode enable_grad(false);
-
 
 	//Convert C++ vector to pytorch tensor
 	int n = transformed_variables.size();
@@ -269,6 +267,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	// Z-scale tensor
 	input_tensor = (input_tensor - min) / (max - min);
+
+	torch::NoGradGuard no_grad;
 
 	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
 
