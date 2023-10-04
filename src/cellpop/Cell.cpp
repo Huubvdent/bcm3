@@ -298,7 +298,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
     }
 
     // Call the LOG() function to print the sizes
-    BCMLOG(logMessage);
+    BCMLOG(logMessage.c_str());
 
 	BCMLOG("scaled");
 
