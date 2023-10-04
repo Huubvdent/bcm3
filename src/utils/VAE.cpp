@@ -11,12 +11,18 @@ VarEncoder::VarEncoder ()
 
 at::Tensor VarEncoder::forward(at::Tensor x, at::Tensor sobol_tensor) 
 {
+    BCMLOG("1");
     at::Tensor first = torch::relu(fc1->forward(x));
+    BCMLOG("2");
     at::Tensor second = torch::relu(fc2->forward(first));
+    BCMLOG("3");
     at::Tensor mu = torch::relu(fc3->forward(second));
+    BCMLOG("4");
     at::Tensor sigma = torch::relu(fc4->forward(second));
+    BCMLOG("5");
     // Use sobol sequence to sample deterministically
     at::Tensor z = mu + sigma * sobol_tensor;
+    BCMLOG("6");
     return z;
 }
 

@@ -230,8 +230,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	cvode_timepoint_iter = 0;
 
 	int sobol_sequence_ix = 0;
-
-	BCMLOG("start of cell initialize");
 	
 
 #if 1
@@ -247,41 +245,26 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	for(size_t i = 0; i < n; i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
-
-	BCMLOG("first");
-
+	
 	auto input_tensor = torch::zeros(n,torch::kFloat32);
-
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
-
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
-	BCMLOG("second");
 
 	//Create sobol sequence tensor as input for encoder
 	//VectorReal& sobol_seq = *sobol_sequence_values;
 
-	BCMLOG("3");
-
 	VectorReal& sobol_sequence = *sobol_sequence_values;
-
-	BCMLOG("4");
 	
 	std::vector<float> sobol_copy;
 	for(size_t i = 0; i < n; i++){
 		sobol_copy.push_back((float) sobol_sequence[i]);
 	}
 
-	BCMLOG("fourth");
 	auto sobol_tensor = torch::zeros(2,torch::kFloat32);
-
-	BCMLOG("5");
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
-
-	BCMLOG("6");
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
-	BCMLOG("7");
 	// Z-scale tensor
 	input_tensor = (input_tensor - min) / (max - min);
 
@@ -299,8 +282,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
     // Call the LOG() function to print the sizes
     BCMLOG(logMessage.c_str());
-
-	BCMLOG("scaled");
 
 	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
 
