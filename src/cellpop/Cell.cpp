@@ -270,7 +270,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	Real second = sobol_seq[1];
 
-	cout << second;
+	std::cout << second;
 
 	BCMLOG("test");
 
