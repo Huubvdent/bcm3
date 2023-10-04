@@ -1,8 +1,5 @@
 #include "VAE.h"
 
-#include <torch/script.h>
-#include <torch/torch.h>
-
 namespace bcm3{
 
 VarEncoder::VarEncoder () 
