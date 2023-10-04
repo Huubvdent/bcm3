@@ -1196,23 +1196,19 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	at::Tensor encoder_1_weight = container.attr("encoder_1_weight").toTensor();
 	at::Tensor encoder_2_weight = container.attr("encoder_2_weight").toTensor();
 	at::Tensor encoder_3_weight = container.attr("encoder_3_weight").toTensor();
-	at::Tensor encoder_4_weight = container.attr("encoder_4_weight").toTensor();
 
 	at::Tensor encoder_1_bias = container.attr("encoder_1_bias").toTensor();
 	at::Tensor encoder_2_bias = container.attr("encoder_2_bias").toTensor();
 	at::Tensor encoder_3_bias = container.attr("encoder_3_bias").toTensor();
-	at::Tensor encoder_4_bias = container.attr("encoder_4_bias").toTensor();
 
 	at::Tensor decoder_1_weight = container.attr("decoder_1_weight").toTensor();
 	at::Tensor decoder_2_weight = container.attr("decoder_2_weight").toTensor();
-	at::Tensor decoder_3_weight = container.attr("decoder_3_weight").toTensor();
 
 	at::Tensor decoder_1_bias = container.attr("decoder_1_bias").toTensor();
 	at::Tensor decoder_2_bias = container.attr("decoder_2_bias").toTensor();
-	at::Tensor decoder_3_bias = container.attr("decoder_3_bias").toTensor();
 
-	encoder->load_weights(encoder_1_weight, encoder_2_weight, encoder_3_weight, encoder_4_weight, encoder_1_bias, encoder_2_bias, encoder_3_bias, encoder_4_bias);
-	decoder->load_weights(decoder_1_weight, decoder_2_weight, decoder_3_weight, decoder_1_bias, decoder_2_bias, decoder_3_bias);
+	encoder->load_weights(encoder_1_weight, encoder_2_weight, encoder_3_weight, encoder_1_bias, encoder_2_bias, encoder_3_bias);
+	decoder->load_weights(decoder_1_weight, decoder_2_weight, decoder_1_bias, decoder_2_bias);
 
 	encoder->eval();
 	decoder->eval();
