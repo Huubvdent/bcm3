@@ -1190,8 +1190,8 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	//load the weight here!!
 	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_vae_run/container.pt");
 
-	at::Tensor mean = container.attr("mean").toTensor();
-	at::Tensor std = container.attr("std").toTensor();
+	at::Tensor min = container.attr("min").toTensor();
+	at::Tensor max = container.attr("max").toTensor();
 
 	at::Tensor encoder_1_weight = container.attr("encoder_1_weight").toTensor();
 	at::Tensor encoder_2_weight = container.attr("encoder_2_weight").toTensor();
@@ -1222,7 +1222,7 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	BCMLOG("eval mode");
 #endif
 
-	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, mean, std);
+	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, min, max);
 
 	if (!result) {
 		return std::numeric_limits<size_t>::max();
