@@ -14,10 +14,10 @@ at::Tensor VarEncoder::forward(at::Tensor x, at::Tensor sobol_tensor)
 {
     x = torch::relu(fc1->forward(x));
     x = torch::relu(fc2->forward(x));
-    torch::Tensor mu = torch::relu(fc3->forward(x));
-    torch::Tensor sigma = torch::relu(fc4->forward(x));
+    at::Tensor mu = torch::relu(fc3->forward(x));
+    at::Tensor sigma = torch::relu(fc4->forward(x));
     // Use sobol sequence to sample deterministically
-    torch::Tensor z = mu + sigma * sobol_tensor;
+    at::Tensor z = mu + sigma * sobol_tensor;
     return z;
 }
 
