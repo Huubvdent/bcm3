@@ -272,7 +272,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	for(size_t i = 0; i < 2; i++){
 		BCMLOG("LOOP");
-		BCMLOG(sobol_seq[0]);
 		sobol_copy.push_back((double) sobol_seq[sobol_sequence_ix++]);
 	}
 
