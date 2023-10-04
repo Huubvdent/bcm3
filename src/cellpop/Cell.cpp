@@ -266,15 +266,10 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	BCMLOG("4");
 
-	VectorReal& sobol_vec = *sobol_sequence_values;
-
-	BCMLOG(((int)sobol_vec.cols()).c_str());
-	BCMLOG(((int)sobol_vec.rows()).c_str());
-
-	Real first = sobol_vec(0);
+	double first = (*sobol_sequence_values)(0, 0);
 
 	BCMLOG("5");
-	Real second = sobol_vec(1);
+	double second = (*sobol_sequence_values)(1, 0);
 
 	BCMLOG("accessed sobol seq");
 	sobol_copy.push_back(first);
