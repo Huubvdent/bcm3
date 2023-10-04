@@ -268,8 +268,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	VectorReal& sobol_vec = *sobol_sequence_values;
 
-	BCMLOG(sobol_vec.cols());
-	BCMLOG(sobol_vec.rows());
+	BCMLOG(sobol_vec.cols().c_str());
+	BCMLOG(sobol_vec.rows().c_str());
 
 	Real first = sobol_vec(0);
 
