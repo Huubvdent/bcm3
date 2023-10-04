@@ -256,6 +256,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
+	input_tensor = input_tensor.transpose(0, 1);
+
 	BCMLOG("second");
 
 	//Create sobol sequence tensor as input for encoder
