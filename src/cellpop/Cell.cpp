@@ -268,8 +268,15 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Z-scale tensor
 	input_tensor = (input_tensor - mean) / std;
 
+	BCMLOG("scaled");
+
 	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+
+	BCMLOG("latent");
+
 	at::Tensor output = decoder->forward(latent);
+
+	BCMLOG("output")
 
 	// Rescale output
 	output = (output * std) + mean;
