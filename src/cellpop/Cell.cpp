@@ -286,7 +286,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	input_tensor = (input_tensor - min) / (max - min);
 
 	// Get the sizes of all dimensions
-    std::vector<int64_t> sizes = input_tensor.sizes();
+    c10::IntArrayRef sizes = input_tensor.sizes();
 
     // Log the sizes of all dimensions
     std::string logMessage = "Tensor Sizes: ";
