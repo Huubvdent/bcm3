@@ -258,14 +258,14 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	BCMLOG("second");
 
 	//Create sobol sequence tensor as input for encoder
-	VectorReal& sobol_seq = *sobol_sequence_values;
+	//VectorReal& sobol_seq = *sobol_sequence_values;
 
 	BCMLOG("3");
 
 	std::vector<double> sobol_copy;
 
-	Real first = sobol_seq(0);
-	Real second = sobol_seq(1);
+	Real first = sobol_sequence_values(0);
+	Real second = sobol_sequence_values(1);
 
 	BCMLOG("accessed sobol seq");
 	sobol_copy.push_back(first);
