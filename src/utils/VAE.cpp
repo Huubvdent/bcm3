@@ -3,6 +3,8 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
+namespace bcm3{
+
 VarEncoder::VarEncoder () 
       : fc1(register_module("fc1", torch::nn::Linear(13, 10))),
         fc2(register_module("fc2", torch::nn::Linear(10, 6))),
@@ -59,4 +61,6 @@ void Decoder::load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_wei
     fc1->bias = decoder_1_bias;
     fc2->bias = decoder_2_bias;
     fc3->bias = decoder_3_bias;
+}
+
 }

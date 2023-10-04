@@ -142,7 +142,7 @@ protected:
 	std::vector<std::vector<VectorReal>> simulated_trajectories;
 	std::vector<size_t> simulated_cell_parents;
 	size_t simulated_num_cells;
-	std::shared_ptr<boost::random::sobol> sobol_sequence;
+	std::<boost::random::sobol> sobol_sequence;
 	std::vector<size_t> sobol_sequence_indices;
 	std::vector<VectorReal> sobol_sequence_values;
 

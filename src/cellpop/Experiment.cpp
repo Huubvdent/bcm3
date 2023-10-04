@@ -1183,9 +1183,9 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 
 #if 1
 	// Instantiate VAE
-	std::shared_ptr<VarEncoder> encoder = std::make_shared<VarEncoder>();
+	std::shared_ptr<bcm3::VarEncoder> encoder = std::make_shared<bcm3::VarEncoder>();
 	
-	std::shared_ptr<Decoder> decoder = std::make_shared<Decoder>();
+	std::shared_ptr<bcm3::Decoder> decoder = std::make_shared<bcm3::Decoder>();
 
 	//load the weight here!!
 	torch::jit::script::Module container = torch::jit::load("container.pt");

@@ -3,6 +3,8 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
+namespace bcm3{
+
 struct VarEncoder : torch::nn::Module {
     VarEncoder ();
     at::Tensor forward(at::Tensor x, at::Tensor sobol_tensor);
@@ -21,3 +23,5 @@ struct Decoder : torch::nn::Module {
     torch::nn::Linear fc2{nullptr};
     torch::nn::Linear fc3{nullptr};
 };
+
+}
