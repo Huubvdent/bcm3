@@ -271,11 +271,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	auto sobol_tensor = torch::zeros(2,torch::kDouble);
 
-	BCMLOG("5")
+	BCMLOG("5");
 
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
 
-	BCMLOG("6")
+	BCMLOG("6");
 
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(double)*sobol_tensor.numel());
 
