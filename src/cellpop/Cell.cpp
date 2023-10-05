@@ -269,7 +269,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
 	// Z-scale tensor
-	input_tensor = (input_tensor - min) / (max - min);
+	scaled_input_tensor = (input_tensor - min) / (max - min);
 
 	torch::NoGradGuard no_grad;
 
@@ -278,17 +278,53 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		return false;
 	}
 
-	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+	at::Tensor latent = encoder->forward(scaled_input_tensor, sobol_tensor);
 
 	at::Tensor output = decoder->forward(latent);
 
 	// Rescale output
-	output = output * (max - min) + min;
+	output_rescaled = output * (max - min) + min;
 
 	// Create C++ output vector
-	output = output.contiguous();
+	output_rescaled = output_rescaled.contiguous();
 
-	std::vector<float> result_vector(output.data_ptr<float>(), output.data_ptr<float>() + output.numel());
+	std::vector<float> result_vector(output_rescaled.data_ptr<float>(), output_rescaled.data_ptr<float>() + output_rescaled.numel());
+#endif
+
+#if 1
+	//write tensors to memory to make comparison
+	int randNum = rand()%(10000 + 1);
+	std::string unique_name = std::to_string(randNum);
+
+	std::string weight_name_encoder = unique_name + "_weight_encoder.pt";
+	auto weight_encoder = torch::pickle_save(encoder.fc1.weight);
+	std::ofstream fout(weight_name_encoder, std::ios::out | std::ios::binary);
+	fout.write(weight_encoder.data(), weight_encoder.size());
+	fout.close();
+
+	std::string weight_name_decoder = unique_name + "_weight_decoder.pt";
+	auto weight_decoder = torch::pickle_save(decoder.fc1.weight);
+	std::ofstream fout(weight_name_decoder, std::ios::out | std::ios::binary);
+	fout.write(weight_decoder.data(), weight_decoder.size());
+	fout.close();
+
+	std::string input_name = unique_name + "_input.pt";
+	auto input = torch::pickle_save(input_tensor);
+	std::ofstream fout(input_name, std::ios::out | std::ios::binary);
+	fout.write(input.data(), input.size());
+	fout.close();
+
+	std::string latent_name = unique_name + "_latent.pt";
+	auto latent_space = torch::pickle_save(latent);
+	std::ofstream fout(latent_name, std::ios::out | std::ios::binary);
+	fout.write(latent_space.data(), latent_space.size());
+	fout.close();
+
+	std::string output_name = unqique_name + "_output.pt";
+	auto output_space = torch::pickle_save(output_rescaled);
+	std::ofstream fout(output_name, std::ios::out | std::ios::binary);
+	fout.write(output_space.data(), output_space.size());
+	fout.close();
 #endif
 
     for(size_t j = 0; j < n; j++){
