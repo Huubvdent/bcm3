@@ -255,11 +255,18 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	//VectorReal& sobol_seq = *sobol_sequence_values;
 
 	VectorReal& sobol_sequence = *sobol_sequence_values;
+
+	double unif_1 = sobol_sequence[0];
+
+	double unif_2 = sobol_sequence[1];
+
+	double gauss_1 = sqrt(-2 * log(unif_1) * cos(2 * M_PI * unif_2));
+	double gauss_2 = sqrt(-2 * log(unif_1) * sin(2 * M_PI * unif_2));
 	
 	std::vector<float> sobol_copy;
-	for(size_t i = 0; i < n; i++){
-		sobol_copy.push_back((float) sobol_sequence[i]);
-	}
+	
+	sobol_copy.push_back(gauss_1);
+	sobol_copy.push_bakc(gauss_2);
 
 	auto sobol_tensor = torch::zeros(2,torch::kFloat32);
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
