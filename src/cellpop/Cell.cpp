@@ -298,33 +298,33 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::string weight_name_encoder = unique_name + "_weight_encoder.pt";
 	auto weight_encoder = torch::pickle_save(encoder.fc1.weight);
-	std::ofstream fout(weight_name_encoder, std::ios::out | std::ios::binary);
-	fout.write(weight_encoder.data(), weight_encoder.size());
-	fout.close();
+	std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
+	fout1.write(weight_encoder.data(), weight_encoder.size());
+	fout1.close();
 
 	std::string weight_name_decoder = unique_name + "_weight_decoder.pt";
 	auto weight_decoder = torch::pickle_save(decoder.fc1.weight);
-	std::ofstream fout(weight_name_decoder, std::ios::out | std::ios::binary);
-	fout.write(weight_decoder.data(), weight_decoder.size());
-	fout.close();
+	std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
+	fout2.write(weight_decoder.data(), weight_decoder.size());
+	fout2.close();
 
 	std::string input_name = unique_name + "_input.pt";
 	auto input = torch::pickle_save(input_tensor);
-	std::ofstream fout(input_name, std::ios::out | std::ios::binary);
-	fout.write(input.data(), input.size());
-	fout.close();
+	std::ofstream fout3(input_name, std::ios::out | std::ios::binary);
+	fout3.write(input.data(), input.size());
+	fout3.close();
 
 	std::string latent_name = unique_name + "_latent.pt";
 	auto latent_space = torch::pickle_save(latent);
-	std::ofstream fout(latent_name, std::ios::out | std::ios::binary);
-	fout.write(latent_space.data(), latent_space.size());
-	fout.close();
+	std::ofstream fout4(latent_name, std::ios::out | std::ios::binary);
+	fout4.write(latent_space.data(), latent_space.size());
+	fout4.close();
 
 	std::string output_name = unqique_name + "_output.pt";
 	auto output_space = torch::pickle_save(output_rescaled);
-	std::ofstream fout(output_name, std::ios::out | std::ios::binary);
-	fout.write(output_space.data(), output_space.size());
-	fout.close();
+	std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
+	fout5.write(output_space.data(), output_space.size());
+	fout5.close();
 #endif
 
     for(size_t j = 0; j < n; j++){
