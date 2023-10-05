@@ -273,16 +273,14 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	torch::NoGradGuard no_grad;
 
-	if(!torch::GradMode::is_enabled()){
-		at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
-
-		at::Tensor output = decoder->forward(latent);
-	} else {
+	if(torch::GradMode::is_enabled()){
 		BCMLOG("gradients should not be calculated!");
 		return false;
 	}
 
-	
+	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+
+	at::Tensor output = decoder->forward(latent);
 
 	// Rescale output
 	output = output * (max - min) + min;
