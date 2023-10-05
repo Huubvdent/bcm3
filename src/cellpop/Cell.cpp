@@ -284,8 +284,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	output = output.contiguous();
 
 	std::vector<float> result_vector(output.data_ptr<float>(), output.data_ptr<float>() + output.numel());
-
-	
 #endif
 
     for(size_t j = 0; j < n; j++){
