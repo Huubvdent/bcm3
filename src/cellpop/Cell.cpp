@@ -266,7 +266,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::vector<float> sobol_copy;
 	
 	sobol_copy.push_back(gauss_1);
-	sobol_copy.push_bakc(gauss_2);
+	sobol_copy.push_back(gauss_2);
 
 	auto sobol_tensor = torch::zeros(2,torch::kFloat32);
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
