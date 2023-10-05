@@ -230,17 +230,14 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	cvode_timepoint_iter = 0;
 
 	int sobol_sequence_ix = 0;
+
+	//Convert C++ vector to pytorch tensor
+	int n = transformed_variables.size();
 	
 
 #if 1
 	//VAE mode
 	//load VAE model from python
-
-
-	//Convert C++ vector to pytorch tensor
-	int n = transformed_variables.size();
-
-
 	std::vector<float> variable_copy;
 	for(size_t i = 0; i < n; i++){
 		variable_copy.push_back((float) transformed_variables[i]);
@@ -249,7 +246,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	auto input_tensor = torch::zeros(n,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
-
 
 	//Create sobol sequence tensor as input for encoder
 	//VectorReal& sobol_seq = *sobol_sequence_values;
@@ -260,8 +256,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double unif_2 = sobol_sequence[1];
 
-	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2) * 2;
-	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2) * 2;
+	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2);
+	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2);
 	
 	std::vector<float> sobol_copy;
 	
@@ -289,12 +285,14 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	std::vector<float> result_vector(output.data_ptr<float>(), output.data_ptr<float>() + output.numel());
 
-	for(size_t j = 0; j < (n - 1); j++){
-		cell_specific_transformed_variables[j] = (double) result_vector[j];
+	
+#endif
+
+    for(size_t j = 0; j < n; j++){
+		cell_specific_transformed_variables[j] = transformed_variables[j];
 	}
 
-	this->creation_time = (double) result_vector[entry_time_ix];
-#endif
+	this->creation_time = transformed_variables[entry_time_ix];
 
 #if 0
 	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
