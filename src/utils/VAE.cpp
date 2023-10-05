@@ -29,6 +29,10 @@ void VarEncoder::load_weights(at::Tensor encoder_1_weight, at::Tensor encoder_2_
     fc3->bias = encoder_3_bias;
 }
 
+at::Tensor VarEncoder::get_weights_fc1(){
+    return fc1->weight;
+}
+
 
 
 Decoder::Decoder () 
@@ -50,6 +54,10 @@ void Decoder::load_weights(at::Tensor decoder_1_weight, at::Tensor decoder_2_wei
 
     fc1->bias = decoder_1_bias;
     fc2->bias = decoder_2_bias;
+}
+
+at::Tensor Decoder::get_weights_fc1(){
+    return fc1->weight;
 }
 
 }

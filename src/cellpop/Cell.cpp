@@ -297,13 +297,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::string unique_name = std::to_string(randNum);
 
 	std::string weight_name_encoder = unique_name + "_weight_encoder.pt";
-	auto weight_encoder = torch::pickle_save(encoder.fc1.weight);
+	auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
 	std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
 	fout1.write(weight_encoder.data(), weight_encoder.size());
 	fout1.close();
 
 	std::string weight_name_decoder = unique_name + "_weight_decoder.pt";
-	auto weight_decoder = torch::pickle_save(decoder.fc1.weight);
+	auto weight_decoder = torch::pickle_save(encoder->get_weights_fc1());
 	std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
 	fout2.write(weight_decoder.data(), weight_decoder.size());
 	fout2.close();
@@ -320,7 +320,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	fout4.write(latent_space.data(), latent_space.size());
 	fout4.close();
 
-	std::string output_name = unqique_name + "_output.pt";
+	std::string output_name = unique_name + "_output.pt";
 	auto output_space = torch::pickle_save(output_rescaled);
 	std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
 	fout5.write(output_space.data(), output_space.size());
