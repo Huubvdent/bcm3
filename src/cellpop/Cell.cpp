@@ -269,7 +269,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
 	// Z-scale tensor
-	scaled_input_tensor = (input_tensor - min) / (max - min);
+	at::Tensor scaled_input_tensor = (input_tensor - min) / (max - min);
 
 	torch::NoGradGuard no_grad;
 
@@ -283,7 +283,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	at::Tensor output = decoder->forward(latent);
 
 	// Rescale output
-	output_rescaled = output * (max - min) + min;
+	at::Tensor output_rescaled_pytorch = output * (max - min) + min;
 
 	// Create C++ output vector
 	output_rescaled = output_rescaled.contiguous();
@@ -321,7 +321,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	fout4.close();
 
 	std::string output_name = unique_name + "_output.pt";
-	auto output_space = torch::pickle_save(output_rescaled);
+	auto output_space = torch::pickle_save(output_rescaled_pytorch);
 	std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
 	fout5.write(output_space.data(), output_space.size());
 	fout5.close();
