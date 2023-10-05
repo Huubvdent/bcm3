@@ -273,9 +273,16 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	torch::NoGradGuard no_grad;
 
-	at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
+	if(!torch::GradMode::is_enabled()){
+		at::Tensor latent = encoder->forward(input_tensor, sobol_tensor);
 
-	at::Tensor output = decoder->forward(latent);
+		at::Tensor output = decoder->forward(latent);
+	} else {
+		BCMLOG("gradients should not be calculated!");
+		return false;
+	}
+
+	
 
 	// Rescale output
 	output = output * (max - min) + min;
@@ -287,10 +294,10 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 #endif
 
     for(size_t j = 0; j < n; j++){
-		cell_specific_transformed_variables[j] = transformed_variables[j];
+		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
 
-	this->creation_time = transformed_variables[entry_time_ix];
+	this->creation_time = (double) result_vector[entry_time_ix];
 
 #if 0
 	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
