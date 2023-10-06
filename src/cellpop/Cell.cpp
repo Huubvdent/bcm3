@@ -252,8 +252,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
-	double unif_1 = sobol_sequence[sobol_sequence_ix++];
-	double unif_2 = sobol_sequence[sobol_sequence_ix++];
+	double unif_1 = sobol_sequence[0];
+	double unif_2 = sobol_sequence[1];
 
 	std::vector<float> sobol_unif_copy;
 	auto sobol_unif_tensor = torch::zeros(2,torch::kFloat32);
