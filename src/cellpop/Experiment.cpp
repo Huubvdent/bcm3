@@ -1188,7 +1188,7 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	std::shared_ptr<bcm3::Decoder> decoder = std::make_shared<bcm3::Decoder>();
 
 	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_vae_run/container.pt");
+	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_vae_tensor_output/container.pt");
 
 	at::Tensor min = container.attr("min").toTensor();
 	at::Tensor max = container.attr("max").toTensor();
