@@ -293,7 +293,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 #if 1
 	//write tensors to memory to make comparison
-	int randNum = rand()%(10000 + 1);
+	int randNum = rand()%(1000000 + 1);
 	std::string unique_name = std::to_string(randNum);
 
 	std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
