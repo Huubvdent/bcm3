@@ -303,7 +303,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	fout1.close();
 
 	std::string weight_name_decoder = "output_tensors/" + unique_name + "_weight_decoder.pt";
-	auto weight_decoder = torch::pickle_save(encoder->get_weights_fc1());
+	auto weight_decoder = torch::pickle_save(decoder->get_weights_fc1());
 	std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
 	fout2.write(weight_decoder.data(), weight_decoder.size());
 	fout2.close();
