@@ -296,7 +296,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	int randNum = rand()%(10000 + 1);
 	std::string unique_name = std::to_string(randNum);
 
-	std::string weight_name_encoder = "output_tensors/" unique_name + "_weight_encoder.pt";
+	std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
 	auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
 	std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
 	fout1.write(weight_encoder.data(), weight_encoder.size());
