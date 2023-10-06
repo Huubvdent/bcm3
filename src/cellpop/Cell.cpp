@@ -256,8 +256,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double unif_2 = sobol_sequence[1];
 
-	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_1);
-	double gauss_2 = sqrt(-2 * log(unif_2)) * sin(2 * M_PI * unif_2);
+	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2);
+	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2);
 	
 	std::vector<float> sobol_copy;
 	
