@@ -252,9 +252,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
-	double unif_1 = sobol_sequence[0];
+	double unif_1 = sobol_sequence[sobol_sequence_ix++];
+	double unif_2 = sobol_sequence[sobol_sequence_ix++];
 
-	double unif_2 = sobol_sequence[1];
+	std::vector<float> sobol_unif_copy;
+	auto sobol_unif_tensor = torch::zeros(2,torch::kFloat32);
+	const void* sobol_unif_ptr = static_cast<const void*>(sobol_unif_copy.data());
+	std::memcpy(sobol_unif_tensor.data_ptr(),sobol_unif_ptr,sizeof(float)*sobol_unif_tensor.numel());
 
 	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2);
 	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2);
@@ -331,6 +335,12 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::ofstream fout6(sobol_name, std::ios::out | std::ios::binary);
 	fout6.write(output_sobol.data(), output_sobol.size());
 	fout6.close();
+
+	std::string sobol_unif_name = "output_tensors/" + unique_name + "_sobol_unif.pt";
+	auto output_sobol_unif = torch::pickle_save(sobol_unif_tensor);
+	std::ofstream fout7(sobol_unif_name, std::ios::out | std::ios::binary);
+	fout7.write(output_sobol_unif.data(), output_sobol_unif.size());
+	fout7.close();
 #endif
 
     for(size_t j = 0; j < n; j++){
