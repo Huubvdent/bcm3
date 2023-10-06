@@ -326,9 +326,9 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	fout5.write(output_space.data(), output_space.size());
 	fout5.close();
 
-	std::string output_name = "output_tensors/" + unique_name + "_sobol.pt";
+	std::string sobol_name = "output_tensors/" + unique_name + "_sobol.pt";
 	auto output_sobol = torch::pickle_save(sobol_tensor);
-	std::ofstream fout6(output_sobol, std::ios::out | std::ios::binary);
+	std::ofstream fout6(sobol_name, std::ios::out | std::ios::binary);
 	fout6.write(output_sobol.data(), output_sobol.size());
 	fout6.close();
 #endif
