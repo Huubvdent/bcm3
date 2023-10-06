@@ -256,6 +256,10 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	double unif_2 = sobol_sequence[1];
 
 	std::vector<float> sobol_unif_copy;
+
+	sobol_unif_copy.push_back((float) unif_1);
+	sobol_unif_copy.push_back((float) unif_2);
+
 	auto sobol_unif_tensor = torch::zeros(2,torch::kFloat32);
 	const void* sobol_unif_ptr = static_cast<const void*>(sobol_unif_copy.data());
 	std::memcpy(sobol_unif_tensor.data_ptr(),sobol_unif_ptr,sizeof(float)*sobol_unif_tensor.numel());
