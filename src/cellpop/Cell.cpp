@@ -286,7 +286,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	at::Tensor output_rescaled_pytorch = output * (max - min) + min;
 
 	// Create C++ output vector
-	output_rescaled = output_rescaled_pytorch.contiguous();
+	at::Tensor output_rescaled = output_rescaled_pytorch.contiguous();
 
 	std::vector<float> result_vector(output_rescaled.data_ptr<float>(), output_rescaled.data_ptr<float>() + output_rescaled.numel());
 #endif
