@@ -262,8 +262,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* sobol_unif_ptr = static_cast<const void*>(sobol_unif_copy.data());
 	std::memcpy(sobol_unif_tensor.data_ptr(),sobol_unif_ptr,sizeof(float)*sobol_unif_tensor.numel());
 
-	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2);
-	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2);
+	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2) * 2;
+	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2) * 2;
 	
 	std::vector<float> sobol_copy;
 	
