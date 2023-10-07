@@ -248,8 +248,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
 	//Create sobol sequence tensor as input for encoder
-	//VectorReal& sobol_seq = *sobol_sequence_values;
-
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
 	double unif_1 = sobol_sequence[0];
