@@ -252,7 +252,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
-	int size_sobol = sobol_sequence.size();
+	int size_sobol = sobol_sequence->size();
 
 	BCMLOG(std::to_string(size));
 
