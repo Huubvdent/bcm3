@@ -304,35 +304,35 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	int randNum = rand()%(1000000 + 1);
 	std::string unique_name = std::to_string(randNum);
 
-	std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
-	auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
-	std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
-	fout1.write(weight_encoder.data(), weight_encoder.size());
-	fout1.close();
+	// std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
+	// auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
+	// std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
+	// fout1.write(weight_encoder.data(), weight_encoder.size());
+	// fout1.close();
 
-	std::string weight_name_decoder = "output_tensors/" + unique_name + "_weight_decoder.pt";
-	auto weight_decoder = torch::pickle_save(decoder->get_weights_fc1());
-	std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
-	fout2.write(weight_decoder.data(), weight_decoder.size());
-	fout2.close();
+	// std::string weight_name_decoder = "output_tensors/" + unique_name + "_weight_decoder.pt";
+	// auto weight_decoder = torch::pickle_save(decoder->get_weights_fc1());
+	// std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
+	// fout2.write(weight_decoder.data(), weight_decoder.size());
+	// fout2.close();
 
-	std::string input_name = "output_tensors/" + unique_name + "_input.pt";
-	auto input = torch::pickle_save(input_tensor);
-	std::ofstream fout3(input_name, std::ios::out | std::ios::binary);
-	fout3.write(input.data(), input.size());
-	fout3.close();
+	// std::string input_name = "output_tensors/" + unique_name + "_input.pt";
+	// auto input = torch::pickle_save(input_tensor);
+	// std::ofstream fout3(input_name, std::ios::out | std::ios::binary);
+	// fout3.write(input.data(), input.size());
+	// fout3.close();
 
-	std::string latent_name = "output_tensors/" + unique_name + "_latent.pt";
-	auto latent_space = torch::pickle_save(latent);
-	std::ofstream fout4(latent_name, std::ios::out | std::ios::binary);
-	fout4.write(latent_space.data(), latent_space.size());
-	fout4.close();
+	// std::string latent_name = "output_tensors/" + unique_name + "_latent.pt";
+	// auto latent_space = torch::pickle_save(latent);
+	// std::ofstream fout4(latent_name, std::ios::out | std::ios::binary);
+	// fout4.write(latent_space.data(), latent_space.size());
+	// fout4.close();
 
-	std::string output_name = "output_tensors/" + unique_name + "_output.pt";
-	auto output_space = torch::pickle_save(output_rescaled_pytorch);
-	std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
-	fout5.write(output_space.data(), output_space.size());
-	fout5.close();
+	// std::string output_name = "output_tensors/" + unique_name + "_output.pt";
+	// auto output_space = torch::pickle_save(output_rescaled_pytorch);
+	// std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
+	// fout5.write(output_space.data(), output_space.size());
+	// fout5.close();
 
 	std::string sobol_name = "output_tensors/" + unique_name + "_sobol.pt";
 	auto output_sobol = torch::pickle_save(sobol_tensor);
