@@ -268,9 +268,6 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	double third_var = bcm3::QuantileNormal(unif_3, 0, prior_3);
 	double fourth_var = bcm3::QuantileNormal(unif_4, 0, prior_4);
 
-
-
-
 	//PCA conversion
 	std::vector<float> Variable_input_pca;
 
@@ -283,15 +280,16 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
-	at::Tensor converted = torch::matmul(pca_tensor, eigenvector);
+	at::Tensor original_converted = torch::matmul(input_tensor, eigenvector)
+
+	at::Tensor converted = original_converted + pca_tensor;
+
+	at::Tensor reconverted = torch::matmul(converted, eigenvector);
 
 	//scale tensor to mean and std
-	at::Tensor scaled = (converted * std) + mean;
+	at::Tensor scaled = (reconverted * std) + mean;
 
-	//add this tensor to vector of other variables
-	at::Tensor varied = input_tensor + scaled;
-
-	std::vector<float> result_vector(varied.data_ptr<float>(), varied.data_ptr<float>() + varied.numel());
+	std::vector<float> result_vector(scaled.data_ptr<float>(), scaled.data_ptr<float>() + scaled.numel());
 #endif
 
 	// //write tensors to memory to make comparison
