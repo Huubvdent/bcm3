@@ -290,9 +290,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	//scale tensor to mean and std
 	at::Tensor scaled = (converted * std) + mean;
 
+	at::Tensor twos = torch::ones((13), torch::kFloat32) * 2;
+
 
 	//add this tensor to vector of other variables
-	at::Tensor varied = input_tensor + scaled;
+	at::Tensor varied = torch::mul(input_tensor, torch::pow(twos, scaled));
 
 	std::vector<float> result_vector(varied.data_ptr<float>(), varied.data_ptr<float>() + varied.numel());
 #endif
