@@ -280,7 +280,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
-	at::Tensor original_converted = torch::matmul(input_tensor, eigenvector)
+	at::Tensor original_converted = torch::matmul(input_tensor, eigenvector);
 
 	at::Tensor converted = original_converted + pca_tensor;
 
