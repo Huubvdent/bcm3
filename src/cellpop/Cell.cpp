@@ -242,7 +242,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
-	auto input_tensor = torch::zeros(n,torch::kFloat32);
+	auto input_tensor = torch::zeros(n-2,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
