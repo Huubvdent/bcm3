@@ -1186,10 +1186,10 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	//load the weight here!!
 	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_32_cells/container.pt");
 
-	at::Tensor min = container.attr("mean").toTensor();
-	at::Tensor max = container.attr("std").toTensor();
+	at::Tensor mean = container.attr("mean").toTensor();
+	at::Tensor std = container.attr("std").toTensor();
 
-	at::Tensor encoder_1_weight = container.attr("eigenvector").toTensor();
+	at::Tensor eigenvector = container.attr("eigenvector").toTensor();
 #endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, eigenvector, mean, std);
