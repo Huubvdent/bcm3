@@ -238,11 +238,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 #if 1
 	//Create input tensor with all regular input parameters
 	std::vector<float> variable_copy;
-	for(size_t i = 0; i < (n - 2); i++){
+	for(size_t i = 0; i < (n - 3); i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
-	auto input_tensor = torch::zeros(n-2,torch::kFloat32);
+	auto input_tensor = torch::zeros(n-3,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
@@ -254,13 +254,16 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double unif_1 = sobol_sequence[0];
 	double unif_2 = sobol_sequence[1];
+	double unif_3 = sobol_sequence[2];
 
-	double prior_1 = transformed_variables[n-2];
-	double prior_2 = transformed_variables[n-1];
+	double prior_1 = transformed_variables[n-3];
+	double prior_2 = transformed_variables[n-2];
+	double prior_3 = transformed_variables[n-1];
 
 	
 	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
 	double second_var = bcm3::QuantileNormal(unif_2, 0, prior_2);
+	double third_var = bcm3::QuantileNormal(unif_3, 0, prior_3);
 
 
 
@@ -270,8 +273,9 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	Variable_input_pca.push_back((float) first_var);
 	Variable_input_pca.push_back((float) second_var);
+	Variable_input_pca.push_back((float) third_var);
 
-	auto pca_tensor = torch::zeros(2,torch::kFloat32);
+	auto pca_tensor = torch::zeros(3,torch::kFloat32);
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
