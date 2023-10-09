@@ -277,7 +277,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 
 
-	at::Tensor converted = torch::dot(pca_tensor.transpose(0,1), eigenvector.transpose(0, 1));
+	at::Tensor converted = torch::dot(pca_tensor, eigenvector);
 
 	//scale tensor to mean and std
 	at::Tensor scaled = (converted * std) + mean;
