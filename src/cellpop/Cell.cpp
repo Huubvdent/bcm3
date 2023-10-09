@@ -224,7 +224,7 @@ bool Cell::SetInitialConditionsFromOtherCell(const Cell* other)
 	return true;
 }
 
-bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<bcm3::VarEncoder> encoder, std::shared_ptr<bcm3::Decoder> decoder, at::Tensor min, at::Tensor max)
+bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, at::Tensor eigenvector, at::Tensor mean, at::Tensor std)
 {
 	cvode_steps = 0;
 	cvode_timepoint_iter = 0;
@@ -236,10 +236,9 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	
 
 #if 1
-	//VAE mode
-	//load VAE model from python
+	//Create input tensor with all regular input parameters
 	std::vector<float> variable_copy;
-	for(size_t i = 0; i < n; i++){
+	for(size_t i = 0; i < (n - 2); i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
@@ -247,103 +246,60 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
+
+
+
 	//Create sobol sequence tensor as input for encoder
 	VectorReal& sobol_sequence = *sobol_sequence_values;
 
 	double unif_1 = sobol_sequence[0];
 	double unif_2 = sobol_sequence[1];
 
-	std::vector<float> sobol_unif_copy;
+	double prior_1 = transformed_variables[n-2];
+	double prior_2 = transformed_variables[n-1];
 
-	sobol_unif_copy.push_back((float) unif_1);
-	sobol_unif_copy.push_back((float) unif_2);
-
-	auto sobol_unif_tensor = torch::zeros(2,torch::kFloat32);
-	const void* sobol_unif_ptr = static_cast<const void*>(sobol_unif_copy.data());
-	std::memcpy(sobol_unif_tensor.data_ptr(),sobol_unif_ptr,sizeof(float)*sobol_unif_tensor.numel());
-
-	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2) * 2;
-	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2) * 2;
 	
-	std::vector<float> sobol_copy;
-	
-	sobol_copy.push_back((float) gauss_1);
-	sobol_copy.push_back((float) gauss_2);
+	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
+	double second_var = bcm3::QuantileNormal(unif_2, 0, prior_2);
 
-	auto sobol_tensor = torch::zeros(2,torch::kFloat32);
-	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
-	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
-	// Z-scale tensor
-	at::Tensor scaled_input_tensor = (input_tensor - min) / (max - min);
 
-	torch::NoGradGuard no_grad;
 
-	if(torch::GradMode::is_enabled()){
-		BCMLOG("gradients should not be calculated!");
-		return false;
-	}
+	//PCA conversion
+	std::vector<float> Variable_input_pca;
 
-	at::Tensor latent = encoder->forward(scaled_input_tensor, sobol_tensor);
+	Variable_input_pca.push_back((float) first_var);
+	Variable_input_pca.push_back((float) second_var);
 
-	at::Tensor output = decoder->forward(latent);
+	auto pca_tensor = torch::zeros(2,torch::kFloat32);
+	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
+	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
-	// Rescale output
-	at::Tensor output_rescaled_pytorch = output * (max - min) + min;
 
-	// Create C++ output vector
-	at::Tensor output_rescaled = output_rescaled_pytorch.contiguous();
 
-	std::vector<float> result_vector(output_rescaled.data_ptr<float>(), output_rescaled.data_ptr<float>() + output_rescaled.numel());
+	at::Tensor converted = torch::dot(pca_tensor, eigenvector.transpose(0, 1));
+
+	//scale tensor to mean and std
+	at::Tensor scaled = (converted * std) + mean;
+
+
+	//add this tensor to vector of other variables
+	at::Tensor varied = input_tensor + scaled;
+
+	std::vector<float> result_vector(varied.data_ptr<float>(), varied.data_ptr<float>() + varied.numel());
 #endif
 
-#if 1
-	//write tensors to memory to make comparison
-	int randNum = rand()%(1000000 + 1);
-	std::string unique_name = std::to_string(randNum);
+	// //write tensors to memory to make comparison
+	// int randNum = rand()%(1000000 + 1);
+	// std::string unique_name = std::to_string(randNum);
 
-	std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
-	auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
-	std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
-	fout1.write(weight_encoder.data(), weight_encoder.size());
-	fout1.close();
+	// std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
+	// auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
+	// std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
+	// fout1.write(weight_encoder.data(), weight_encoder.size());
+	// fout1.close();
 
-	std::string weight_name_decoder = "output_tensors/" + unique_name + "_weight_decoder.pt";
-	auto weight_decoder = torch::pickle_save(decoder->get_weights_fc1());
-	std::ofstream fout2(weight_name_decoder, std::ios::out | std::ios::binary);
-	fout2.write(weight_decoder.data(), weight_decoder.size());
-	fout2.close();
 
-	std::string input_name = "output_tensors/" + unique_name + "_input.pt";
-	auto input = torch::pickle_save(input_tensor);
-	std::ofstream fout3(input_name, std::ios::out | std::ios::binary);
-	fout3.write(input.data(), input.size());
-	fout3.close();
-
-	std::string latent_name = "output_tensors/" + unique_name + "_latent.pt";
-	auto latent_space = torch::pickle_save(latent);
-	std::ofstream fout4(latent_name, std::ios::out | std::ios::binary);
-	fout4.write(latent_space.data(), latent_space.size());
-	fout4.close();
-
-	std::string output_name = "output_tensors/" + unique_name + "_output.pt";
-	auto output_space = torch::pickle_save(output_rescaled_pytorch);
-	std::ofstream fout5(output_name, std::ios::out | std::ios::binary);
-	fout5.write(output_space.data(), output_space.size());
-	fout5.close();
-
-	std::string sobol_name = "output_tensors/" + unique_name + "_sobol.pt";
-	auto output_sobol = torch::pickle_save(sobol_tensor);
-	std::ofstream fout6(sobol_name, std::ios::out | std::ios::binary);
-	fout6.write(output_sobol.data(), output_sobol.size());
-	fout6.close();
-
-	std::string sobol_unif_name = "output_tensors/" + unique_name + "_sobol_unif.pt";
-	auto output_sobol_unif = torch::pickle_save(sobol_unif_tensor);
-	std::ofstream fout7(sobol_unif_name, std::ios::out | std::ios::binary);
-	fout7.write(output_sobol_unif.data(), output_sobol_unif.size());
-	fout7.close();
-#endif
 
     for(size_t j = 0; j < n; j++){
 		cell_specific_transformed_variables[j] = (double) result_vector[j];

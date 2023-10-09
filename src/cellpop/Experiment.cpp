@@ -1182,39 +1182,17 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	}
 
 #if 1
-	// Instantiate VAE
-	std::shared_ptr<bcm3::VarEncoder> encoder = std::make_shared<bcm3::VarEncoder>();
-	
-	std::shared_ptr<bcm3::Decoder> decoder = std::make_shared<bcm3::Decoder>();
 
 	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_vae_tensor_output/container.pt");
+	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_32_cells/container.pt");
 
-	at::Tensor min = container.attr("min").toTensor();
-	at::Tensor max = container.attr("max").toTensor();
+	at::Tensor min = container.attr("mean").toTensor();
+	at::Tensor max = container.attr("std").toTensor();
 
-	at::Tensor encoder_1_weight = container.attr("encoder_1_weight").toTensor();
-	at::Tensor encoder_2_weight = container.attr("encoder_2_weight").toTensor();
-	at::Tensor encoder_3_weight = container.attr("encoder_3_weight").toTensor();
-
-	at::Tensor encoder_1_bias = container.attr("encoder_1_bias").toTensor();
-	at::Tensor encoder_2_bias = container.attr("encoder_2_bias").toTensor();
-	at::Tensor encoder_3_bias = container.attr("encoder_3_bias").toTensor();
-
-	at::Tensor decoder_1_weight = container.attr("decoder_1_weight").toTensor();
-	at::Tensor decoder_2_weight = container.attr("decoder_2_weight").toTensor();
-
-	at::Tensor decoder_1_bias = container.attr("decoder_1_bias").toTensor();
-	at::Tensor decoder_2_bias = container.attr("decoder_2_bias").toTensor();
-
-	encoder->load_weights(encoder_1_weight, encoder_2_weight, encoder_3_weight, encoder_1_bias, encoder_2_bias, encoder_3_bias);
-	decoder->load_weights(decoder_1_weight, decoder_2_weight, decoder_1_bias, decoder_2_bias);
-
-	encoder->eval();
-	decoder->eval();
+	at::Tensor encoder_1_weight = container.attr("eigenvector").toTensor();
 #endif
 
-	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, encoder, decoder, min, max);
+	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, eigenvector, mean, std);
 
 	if (!result) {
 		return std::numeric_limits<size_t>::max();
