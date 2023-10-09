@@ -283,18 +283,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
-
-
 	at::Tensor converted = torch::matmul(pca_tensor, eigenvector);
 
 	//scale tensor to mean and std
 	at::Tensor scaled = (converted * std) + mean;
 
-	at::Tensor twos = torch::ones((13), torch::kFloat32) * 2;
-
-
 	//add this tensor to vector of other variables
-	at::Tensor varied = torch::mul(input_tensor, torch::pow(twos, scaled));
+	at::Tensor varied = input_tensor + scaled;
 
 	std::vector<float> result_vector(varied.data_ptr<float>(), varied.data_ptr<float>() + varied.numel());
 #endif
