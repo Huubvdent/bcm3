@@ -278,7 +278,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	at::Tensor complete = log2scaled_input * torch::pow((torch::ones(n-3,torch::kFloat32) * 2), variance_tensor);
 
-	at::Tensor rescaled = torch::pow((torch::ones(n-5,torch::kFloat32) * 2), complete);
+	at::Tensor rescaled = torch::pow((torch::ones(n-3,torch::kFloat32) * 2), complete);
 
 	std::vector<float> result_vector(rescaled.data_ptr<float>(), rescaled.data_ptr<float>() + rescaled.numel());
 #endif
