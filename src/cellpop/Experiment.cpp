@@ -1184,7 +1184,7 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 #if 1
 
 	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_32_cells/container.pt");
+	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_32_v2/container.pt");
 
 	at::Tensor mean = container.attr("mean").toTensor();
 	at::Tensor std = container.attr("std").toTensor();
