@@ -238,11 +238,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 #if 1
 	//Create input tensor with all regular input parameters
 	std::vector<float> variable_copy;
-	for(size_t i = 0; i < (n - 4); i++){
+	for(size_t i = 0; i < (n - 3); i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
-	auto input_tensor = torch::zeros(n-4,torch::kFloat32);
+	auto input_tensor = torch::zeros(n-3,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
@@ -254,40 +254,33 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double unif_1 = sobol_sequence[0];
 	double unif_2 = sobol_sequence[1];
-	double unif_3 = sobol_sequence[2];
-	double unif_4 = sobol_sequence[3];
 
 	double prior_1 = transformed_variables[n-1];
 	double prior_2 = transformed_variables[n-2];
-	double prior_3 = transformed_variables[n-3];
-	double prior_4 = transformed_variables[n-4];
 
 	
 	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
 	double second_var = bcm3::QuantileNormal(unif_2, 0, prior_2);
-	double third_var = bcm3::QuantileNormal(unif_3, 0, prior_3);
-	double fourth_var = bcm3::QuantileNormal(unif_4, 0, prior_4);
 
 	//PCA conversion
 	std::vector<float> Variable_input_pca;
 
 	Variable_input_pca.push_back((float) first_var);
 	Variable_input_pca.push_back((float) second_var);
-	Variable_input_pca.push_back((float) third_var);
-	Variable_input_pca.push_back((float) fourth_var);
 
-	auto pca_tensor = torch::zeros(4,torch::kFloat32);
+	auto pca_tensor = torch::zeros(2,torch::kFloat32);
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
 	at::Tensor variance_tensor = torch::matmul(pca_tensor, eigenvector);
 
-	//scale tensor to mean and std
-	at::Tensor scaled = (variance_tensor * std) + mean;
+	at::Tensor log2scaled_input = torch::log2(input_tensor);
 
-	at::Tensor complete = input_tensor + scaled;
+	at::Tensor complete = log2scaled_input * torch::power((torch::ones(n-5,torch::kFloat32) * 2), variance_tensor);
 
-	std::vector<float> result_vector(scaled.data_ptr<float>(), scaled.data_ptr<float>() + scaled.numel());
+	at::Tensor rescaled = torch::power((torch::ones(n-5,torch::kFloat32) * 2), complete);
+
+	std::vector<float> result_vector(rescaled.data_ptr<float>(), rescaled.data_ptr<float>() + rescaled.numel());
 #endif
 
 	// //write tensors to memory to make comparison
@@ -302,9 +295,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 
 
-    for(size_t j = 0; j < n; j++){
+    for(size_t j = 0; j < n-3; j++){
 		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
+
+	cell_specific_transformed_variables[n-3] = transformed_variables[n-3];
 
 	this->creation_time = (double) result_vector[entry_time_ix];
 
