@@ -280,14 +280,12 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
 	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
 
-	at::Tensor original_converted = torch::matmul(input_tensor, eigenvector.transpose(0,1));
-
-	at::Tensor converted = original_converted + pca_tensor;
-
-	at::Tensor reconverted = torch::matmul(converted, eigenvector);
+	at::Tensor variance_tensor = torch::matmul(pca_tensor, eigenvector);
 
 	//scale tensor to mean and std
-	at::Tensor scaled = (reconverted * std) + mean;
+	at::Tensor scaled = (variance_tensor * std) + mean;
+
+	at::Tensor complete = input_tensor + scaled;
 
 	std::vector<float> result_vector(scaled.data_ptr<float>(), scaled.data_ptr<float>() + scaled.numel());
 #endif
