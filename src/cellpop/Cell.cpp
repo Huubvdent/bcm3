@@ -224,7 +224,7 @@ bool Cell::SetInitialConditionsFromOtherCell(const Cell* other)
 	return true;
 }
 
-bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<bcm3::VarEncoder> encoder, std::shared_ptr<bcm3::Decoder> decoder, at::Tensor min, at::Tensor max)
+bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, std::shared_ptr<bcm3::VarEncoder> encoder, std::shared_ptr<bcm3::Decoder> decoder, at::Tensor mean, at::Tensor std)
 {
 	cvode_steps = 0;
 	cvode_timepoint_iter = 0;
@@ -239,11 +239,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	//VAE mode
 	//load VAE model from python
 	std::vector<float> variable_copy;
-	for(size_t i = 0; i < n; i++){
+	for(size_t i = 0; i < n-1; i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
-	auto input_tensor = torch::zeros(n,torch::kFloat32);
+	auto input_tensor = torch::zeros(n-1,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
 
@@ -262,8 +262,8 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* sobol_unif_ptr = static_cast<const void*>(sobol_unif_copy.data());
 	std::memcpy(sobol_unif_tensor.data_ptr(),sobol_unif_ptr,sizeof(float)*sobol_unif_tensor.numel());
 
-	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2) * 2;
-	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2) * 2;
+	double gauss_1 = sqrt(-2 * log(unif_1)) * cos(2 * M_PI * unif_2);
+	double gauss_2 = sqrt(-2 * log(unif_1)) * sin(2 * M_PI * unif_2);
 	
 	std::vector<float> sobol_copy;
 	
@@ -274,8 +274,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	const void* sobol_ptr = static_cast<const void*>(sobol_copy.data());
 	std::memcpy(sobol_tensor.data_ptr(),sobol_ptr,sizeof(float)*sobol_tensor.numel());
 
+	// log2 scale
+	at::Tensor log2scaled_input = torch::log2(input_tensor);
+
 	// Z-scale tensor
-	at::Tensor scaled_input_tensor = (input_tensor - min) / (max - min);
+	at::Tensor standard_input = (log2scaled_input - mean) / std;
 
 	torch::NoGradGuard no_grad;
 
@@ -284,20 +287,21 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		return false;
 	}
 
-	at::Tensor latent = encoder->forward(scaled_input_tensor, sobol_tensor);
+	at::Tensor latent = encoder->forward(standard_input, sobol_tensor);
 
 	at::Tensor output = decoder->forward(latent);
 
-	// Rescale output
-	at::Tensor output_rescaled_pytorch = output * (max - min) + min;
-
 	// Create C++ output vector
-	at::Tensor output_rescaled = output_rescaled_pytorch.contiguous();
+	at::Tensor output_cont = output.contiguous();
 
-	std::vector<float> result_vector(output_rescaled.data_ptr<float>(), output_rescaled.data_ptr<float>() + output_rescaled.numel());
+	at::Tensor normalized = output_rescaled * std + mean;
+
+	at::Tensor log2reverse = torch::pow((torch::ones(n-1,torch::kFloat32) * 2), normalized);
+
+	std::vector<float> result_vector(log2reverse.data_ptr<float>(), log2reverse.data_ptr<float>() + log2reverse.numel());
 #endif
 
-#if 1
+#if 0
 	//write tensors to memory to make comparison
 	int randNum = rand()%(1000000 + 1);
 	std::string unique_name = std::to_string(randNum);
@@ -345,7 +349,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	fout7.close();
 #endif
 
-    for(size_t j = 0; j < n; j++){
+    for(size_t j = 0; j < n-1; j++){
 		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
 
