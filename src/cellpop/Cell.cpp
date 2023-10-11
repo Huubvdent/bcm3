@@ -294,7 +294,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	// Create C++ output vector
 	at::Tensor output_cont = output.contiguous();
 
-	at::Tensor normalized = output_rescaled * std + mean;
+	at::Tensor normalized = output_cont * std + mean;
 
 	at::Tensor log2reverse = torch::pow((torch::ones(n-1,torch::kFloat32) * 2), normalized);
 

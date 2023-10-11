@@ -1190,8 +1190,8 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	//load the weight here!!
 	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_vae_tensor_output/container.pt");
 
-	at::Tensor min = container.attr("min").toTensor();
-	at::Tensor max = container.attr("max").toTensor();
+	at::Tensor mean = container.attr("mean").toTensor();
+	at::Tensor std = container.attr("std").toTensor();
 
 	at::Tensor encoder_1_weight = container.attr("encoder_1_weight").toTensor();
 	at::Tensor encoder_2_weight = container.attr("encoder_2_weight").toTensor();
