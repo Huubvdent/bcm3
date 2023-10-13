@@ -13,7 +13,7 @@ DataLikelihoodTimeCourse::DataLikelihoodTimeCourse(size_t parallel_evaluations)
 	, synchronize(ESynchronizeCellTrajectory::None)
 	, fixed_missing_simulation_time_stdev_ix(std::numeric_limits<size_t>::max())
 	, fixed_missing_simulation_time_stdev_non_sampled_ix(std::numeric_limits<size_t>::max())
-	, fixed_missing_simulation_time_stdev(300.0)
+	, fixed_missing_simulation_time_stdev(60.0)
 {
 	if (parallel_evaluations > 1) {
 		parallel_population_averages.resize(parallel_evaluations);
