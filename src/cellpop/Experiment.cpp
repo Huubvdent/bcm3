@@ -597,7 +597,7 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 #if 1
 
 	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_24_pca/container.pt");
+	torch::jit::script::Module container = torch::jit::load("container.pt");
 
 	mean = container.attr("mean").toTensor();
 	std = container.attr("std").toTensor();
