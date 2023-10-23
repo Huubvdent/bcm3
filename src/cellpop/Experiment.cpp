@@ -66,19 +66,6 @@ Experiment::Experiment(std::shared_ptr<const bcm3::VariableSet> varset, size_t e
 			AuxEvaluationThreads[i]->thread = std::make_shared<std::thread>(experiment_evaluation_worker, this, i);
 		}
 	}
-
-#if 1
-
-	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_24_pca/container.pt");
-
-	mean = container.attr("mean").toTensor();
-	std = container.attr("std").toTensor();
-
-	eigenvector = container.attr("eigenvector").toTensor();
-#endif
-
-
 }
 
 Experiment::~Experiment()
@@ -605,6 +592,17 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 		}
 	}
 	sobol_sequence_indices.resize(max_number_of_cells, std::numeric_limits<size_t>::max());
+#endif
+
+#if 1
+
+	//load the weight here!!
+	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_24_pca/container.pt");
+
+	mean = container.attr("mean").toTensor();
+	std = container.attr("std").toTensor();
+
+	eigenvector = container.attr("eigenvector").toTensor();
 #endif
 
 	return true;
