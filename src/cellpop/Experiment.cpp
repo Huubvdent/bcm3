@@ -66,6 +66,19 @@ Experiment::Experiment(std::shared_ptr<const bcm3::VariableSet> varset, size_t e
 			AuxEvaluationThreads[i]->thread = std::make_shared<std::thread>(experiment_evaluation_worker, this, i);
 		}
 	}
+
+#if 1
+
+	//load the weight here!!
+	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_24_pca/container.pt");
+
+	mean = container.attr("mean").toTensor();
+	std = container.attr("std").toTensor();
+
+	eigenvector = container.attr("eigenvector").toTensor();
+#endif
+
+
 }
 
 Experiment::~Experiment()
@@ -1180,17 +1193,6 @@ size_t Experiment::AddNewCell(Real time, Cell* parent, const VectorReal& transfo
 	if (!sobol_sequence_values.empty()) {
 		sobol_sequence_indices[new_cell_ix] = sobol_sequence_ix;
 	}
-
-#if 1
-
-	//load the weight here!!
-	torch::jit::script::Module container = torch::jit::load("/home/h.vd.ent/mapk-models/v12_24_pca/container.pt");
-
-	at::Tensor mean = container.attr("mean").toTensor();
-	at::Tensor std = container.attr("std").toTensor();
-
-	at::Tensor eigenvector = container.attr("eigenvector").toTensor();
-#endif
 
 	result &= cell->Initialize(time, transformed_values, sobol_sequence_values.empty() ? nullptr : &sobol_sequence_values[sobol_sequence_ix], entry_time_variable, any_requested_synchronization, abs_tol, rel_tol, entry_time_varix, eigenvector, mean, std);
 

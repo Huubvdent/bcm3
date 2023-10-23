@@ -185,4 +185,9 @@ protected:
 
 	friend class Cell;
 	friend void experiment_evaluation_worker(Experiment* experiment, size_t threadIndex);
+
+	//PCA
+	at::Tensor std;
+	at::Tensor mean;
+	at::Tensor eigenvector;
 };
