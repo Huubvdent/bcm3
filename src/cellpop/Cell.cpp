@@ -297,7 +297,13 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	current_simulation_time = 0;
 	bool result = true;
 	OdeReal cell_end_time = end_time - creation_time;
-	while (current_simulation_time < cell_end_time) {
+
+	OdeReal t1 = 1000.0;
+	OdeReal t2 = cell_end_time;
+
+	int result = CVodeSetStopTime(cvode_mem, t1);
+
+	while (current_simulation_time < t1) {
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
@@ -320,75 +326,48 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 			break;
 		}
 
-#if 0
-		Real hcur;
-		CVodeGetCurrentStep(cvode_mem, &hcur);
-		int qcur;
-		CVodeGetCurrentOrder(cvode_mem, &qcur);
+		// Store relevant information for interpolation at any timepoint later
+		RetrieveCVodeInterpolationInfo();
+		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
 
-		std::ofstream file("tmp.txt", std::ios::app);
-		file.precision(18);
-		file << "CVode step " << std::to_string(cvode_steps + 1);
-		file << "; time=" << current_simulation_time;
-		file << " hcur=" << hcur;
-		file << " qcur=" << qcur;
-		file <<std::endl;
-		//file << "cvode_y=" << EIGV(cvode_y).transpose() << std::endl;
-		file.close();
-#endif
+
+		cvode_steps++;
+	}
+
+	NV_Ith_S(cvode_y, model->GetCVodeSpeciesByName("MEKi", true)) = 1000000.0;
+
+	ret = CVodeReInit(cvode_mem, t1, cvode_y);
+	ret = CVodeSetStopTime(cvode_mem, t2);
+
+	current_simulation_time = t1;
+
+	while (current_simulation_time < t2) {
+		if (cvode_steps >= max_cvode_steps) {
+			cvode_max_steps_reached++;
+			//printf("CVode max steps");
+			result = false;
+			break;
+		}
+
+		Real prev_time = current_simulation_time;
+		int result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		if (result < 0) {
+			// Try once more
+			result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		}
+		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
+			cvode_min_timestep_reached++;
+		}
+		if (result < 0) {
+			//printf("CVode failure: %u", result);
+			result = false;
+			break;
+		}
 
 		// Store relevant information for interpolation at any timepoint later
 		RetrieveCVodeInterpolationInfo();
 		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
 
-		if (DNA_replication_ix != std::numeric_limits<size_t>::max() && replication_start_time != replication_start_time) {
-			Real s = NV_Ith_S(cvode_y, DNA_replication_ix);
-			if (s > 1e-4) {
-				replication_start_time = InterpolateEventTime(DNA_replication_ix, 1e-4, true, prev_time);
-			}
-		}
-		if (DNA_replicated_ix != std::numeric_limits<size_t>::max() && replication_finish_time != replication_finish_time) {
-			Real s = NV_Ith_S(cvode_y, DNA_replicated_ix);
-			if (s > 1.95) {
-				replication_finish_time = InterpolateEventTime(DNA_replicated_ix, 1.95, true, prev_time);
-			}
-		}
-		if (PCNA_gfp_ix != std::numeric_limits<size_t>::max() && PCNA_gfp_increase_time != PCNA_gfp_increase_time) {
-			Real s = NV_Ith_S(cvode_y, PCNA_gfp_ix);
-			if (s > 0.5) {
-				PCNA_gfp_increase_time = InterpolateEventTime(PCNA_gfp_ix, 0.5, true, prev_time);
-			}
-		}
-		if (nuclear_envelope_ix != std::numeric_limits<size_t>::max() && nuclear_envelope_breakdown_time != nuclear_envelope_breakdown_time) {
-			Real s = NV_Ith_S(cvode_y, nuclear_envelope_ix);
-			if (s < 0.5) {
-				nuclear_envelope_breakdown_time = InterpolateEventTime(nuclear_envelope_ix, 0.5, false, prev_time);
-			}
-		}
-		if (chromatid_separation_ix != std::numeric_limits<size_t>::max() && anaphase_onset_time != anaphase_onset_time) {
-			if (NV_Ith_S(cvode_y, chromatid_separation_ix) > 1e-3) {
-				anaphase_onset_time = InterpolateEventTime(chromatid_separation_ix, 1e-3, true, prev_time);
-			}
-		}
-		if (cytokinesis_ix != std::numeric_limits<size_t>::max()) {
-			if (NV_Ith_S(cvode_y, cytokinesis_ix) > 1.0) {
-				achieved_time = InterpolateEventTime(cytokinesis_ix, 1.0, true, prev_time);
-				CalculateEndY(achieved_time);
-				divide = true;
-			}
-		}
-		if (apoptosis_ix != std::numeric_limits<size_t>::max()) {
-			if (NV_Ith_S(cvode_y, apoptosis_ix) > 1.0) {
-				achieved_time = InterpolateEventTime(apoptosis_ix, 1.0, true, prev_time);
-				CalculateEndY(achieved_time);
-				die = true;
-			}
-		}
-
-		if (die || (experiment->divide_cells && divide)) {
-			completed = true;
-			break;
-		}
 
 		cvode_steps++;
 	}
