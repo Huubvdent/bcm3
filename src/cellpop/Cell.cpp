@@ -67,7 +67,7 @@ int Cell::static_cvode_jac_fn(OdeReal t, N_Vector y, N_Vector fy, SUNMatrix Jac,
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
 	if(t > 8500.0){
-		constant_species_y[model->GetConstantSpeciesByName("MEKi", false)] = 10000.0;
+		constant_species_y[0] = 10000.0;
 	}
 	cell->jacobian(Jac, NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 
