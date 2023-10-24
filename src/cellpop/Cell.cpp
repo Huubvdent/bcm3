@@ -33,7 +33,7 @@ int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_d
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
 	if(t > 8500.0){
-		constant_species_y[model->GetConstantSpeciesByName("MEKi", false)] = 10000.0;
+		constant_species_y[0] = 10000.0;
 	}
 	if (Cell::use_generated_code) {
 		cell->derivative(NV_DATA_S(ydot), NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
