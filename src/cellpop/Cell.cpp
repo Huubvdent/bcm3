@@ -334,7 +334,7 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		cvode_steps++;
 	}
 
-	NV_Ith_S(cvode_y, model->GetCVodeSpeciesByName("MEKi", true)) = 1000000.0;
+	NV_Ith_S(cvode_y, model->GetConstantSpeciesByName("MEKi", true)) = 1000000.0;
 
 	CVodeReInit(cvode_mem, t1, cvode_y);
 	CVodeSetStopTime(cvode_mem, t2);
