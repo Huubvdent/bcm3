@@ -32,7 +32,9 @@ static void static_cvode_err_fn(int error_code, const char *module, const char *
 int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_data)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	cell->SetTreatmentConcentration(t);
+	if(t > 8500.0){
+		constant_species_y[model->GetConstantSpeciesByName("MEKi", false)] = 10000.0;
+	}
 	if (Cell::use_generated_code) {
 		cell->derivative(NV_DATA_S(ydot), NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 	} else {
@@ -64,7 +66,9 @@ int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_d
 int Cell::static_cvode_jac_fn(OdeReal t, N_Vector y, N_Vector fy, SUNMatrix Jac, void* user_data, N_Vector ytmp1, N_Vector ytmp2, N_Vector ytmp3)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	cell->SetTreatmentConcentration(t);
+	if(t > 8500.0){
+		constant_species_y[model->GetConstantSpeciesByName("MEKi", false)] = 10000.0;
+	}
 	cell->jacobian(Jac, NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 
 #if 0
@@ -333,8 +337,6 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 		cvode_steps++;
 	}
-
-	NV_Ith_S(cvode_y, model->GetConstantSpeciesByName("MEKi", true)) = 1000000.0;
 
 	CVodeReInit(cvode_mem, t1, cvode_y);
 	CVodeSetStopTime(cvode_mem, t2);
