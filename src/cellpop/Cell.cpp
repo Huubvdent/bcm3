@@ -298,7 +298,7 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	bool result = true;
 	OdeReal cell_end_time = end_time - creation_time;
 
-	OdeReal t1 = 1000.0;
+	OdeReal t1 = 8500.0;
 	OdeReal t2 = cell_end_time;
 
 	int result = CVodeSetStopTime(cvode_mem, t1);
