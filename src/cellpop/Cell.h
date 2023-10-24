@@ -37,6 +37,7 @@ public:
 private:
 	void SetMutations();
 	void SetTreatmentConcentration(Real t);
+	void SetInhibitorConcentration(Real t);
 	void RetrieveCVodeInterpolationInfo();
 	Real InterpolateEventTime(size_t species_ix, Real threshold, bool above, Real prev_time);
 	void CalculateEndY(Real end_time);

@@ -32,9 +32,7 @@ static void static_cvode_err_fn(int error_code, const char *module, const char *
 int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_data)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	if(t > 8500.0){
-		constant_species_y[0] = 10000.0;
-	}
+	cell->SetInhibitorConcentration();
 	if (Cell::use_generated_code) {
 		cell->derivative(NV_DATA_S(ydot), NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 	} else {
@@ -66,9 +64,7 @@ int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_d
 int Cell::static_cvode_jac_fn(OdeReal t, N_Vector y, N_Vector fy, SUNMatrix Jac, void* user_data, N_Vector ytmp1, N_Vector ytmp2, N_Vector ytmp3)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	if(t > 8500.0){
-		constant_species_y[0] = 10000.0;
-	}
+	cell->SetInhibitorConcentration();
 	cell->jacobian(Jac, NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 
 #if 0
@@ -550,6 +546,13 @@ void Cell::SetTreatmentConcentration(Real t)
 	for (size_t i = 0; i < experiment->treatment_trajectories.size(); i++) {
 		size_t ix = experiment->treatment_trajectories_species_ix[i];
 		constant_species_y(ix) = experiment->treatment_trajectories[i]->GetConcentration(t + creation_time, experiment->selected_treatment_trajectory_sample[i]);
+	}
+}
+
+void Cell:SetInhibitorConcentration(Real t)
+{
+	if(t > 8500.0){
+		constant_species_y(0) = 10000.0;
 	}
 }
 
