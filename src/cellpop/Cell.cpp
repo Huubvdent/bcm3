@@ -301,7 +301,7 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	OdeReal t1 = 8500.0;
 	OdeReal t2 = cell_end_time;
 
-	int result = CVodeSetStopTime(cvode_mem, t1);
+	CVodeSetStopTime(cvode_mem, t1);
 
 	while (current_simulation_time < t1) {
 		if (cvode_steps >= max_cvode_steps) {
@@ -336,8 +336,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 	NV_Ith_S(cvode_y, model->GetCVodeSpeciesByName("MEKi", true)) = 1000000.0;
 
-	ret = CVodeReInit(cvode_mem, t1, cvode_y);
-	ret = CVodeSetStopTime(cvode_mem, t2);
+	CVodeReInit(cvode_mem, t1, cvode_y);
+	CVodeSetStopTime(cvode_mem, t2);
 
 	current_simulation_time = t1;
 
