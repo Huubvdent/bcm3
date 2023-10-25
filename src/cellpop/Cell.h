@@ -19,6 +19,7 @@ public:
 	bool Simulate(Real end_time, bool &die, bool &divide, Real& achieved_time);
 
 	Real GetInterpolatedSpeciesValue(Real time, size_t i, ESynchronizeCellTrajectory synchronize);
+	Real GetConstantSpeciesValueAtTime(Real time, size_t species_ix);
 	void RestartInterpolationIteration();
 	bool CellAliveAtTime(Real time, ESynchronizeCellTrajectory synchronize) const;
 	inline bool CellCompleted() const { return completed; }
@@ -74,6 +75,7 @@ private:
 	};
 	std::vector<CVodeTimepoint> cvode_timepoints;
 	OdeMatrixReal cvode_timepoints_zn[6];
+	std::vector<OdeVectorReal> constant_species_timepoints;
 	size_t cvode_timepoint_iter;
 	Real synchronize_offset_time;
 
