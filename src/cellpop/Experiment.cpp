@@ -235,7 +235,7 @@ bool Experiment::EvaluateLogProbability(size_t threadix, const VectorReal& value
 				}
 				for (size_t j = 0; j < cell_model.GetNumConstantSpecies(); j++) {
 					size_t simix = cell_model.GetSimulatedSpeciesFromConstantSpecies(j);
-					simulated_trajectories[i][ti](simix) = cells[i]->GetConstantSpeciesValueAtTime(output_t, j);
+					simulated_trajectories[i][ti](simix) = cells[i]->GetConstantSpeciesValueAtTime(j);
 				}
 				for (size_t j = 0; j < treatment_trajectories.size(); j++) {
 					size_t simix = cell_model.GetSimulatedSpeciesByName(cell_model.GetConstantSpeciesName(treatment_trajectories_species_ix[j]));
