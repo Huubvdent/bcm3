@@ -578,7 +578,9 @@ void Cell::RetrieveCVodeInterpolationInfo()
 	cvt.cv_hu		= cv_mem->cv_hu;
 	cvt.cv_q		= cv_mem->cv_q;
 
-	constant_species_timepoints[cvode_steps] = constant_species_y;
+	for(int i = 0; i < model->GetNumConstantSpecies(); i++){
+		constant_species_timepoints[i][cvode_steps] = constant_species_y[i];
+	}
 
 	ASSERT(cvt.cv_q <= 5);
 	for (int j = cv_mem->cv_q; j >= 0; j--) {
