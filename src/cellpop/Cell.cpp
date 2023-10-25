@@ -477,9 +477,9 @@ Real Cell::GetInterpolatedSpeciesValue(Real time, size_t species_ix, ESynchroniz
 	return cvode_interpolate_y(species_ix);
 }
 
-Real Cell::GetConstantSpeciesValueAtTime(Real time, size_t species_ix)
+Real Cell::GetConstantSpeciesValueAtTime(size_t species_ix)
 {
-	return constant_species_timepoints[species_ix][time];
+	return constant_species_timepoints[species_ix][cvode_timepoint_iter];
 }
 
 void Cell::RestartInterpolationIteration()
