@@ -562,7 +562,7 @@ void Cell::SetTreatmentConcentration(Real t)
 void Cell::SetInhibitorConcentration(Real t)
 {
 	if(t > 8500.0){
-		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 10000.0;
+		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 1000.0;
 	}
 }
 
