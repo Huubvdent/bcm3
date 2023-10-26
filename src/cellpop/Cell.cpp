@@ -303,8 +303,9 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	bool result = true;
 	OdeReal cell_end_time = end_time - creation_time;
 
-	OdeReal t1 = 8500.0;
-	OdeReal t2 = cell_end_time;
+	OdeReal t1 = 7200.0;
+	OdeReal t2 = 16128.0;
+	OdeReal t3 = cell_end_time;
 
 	CVodeSetStopTime(cvode_mem, t1);
 
@@ -345,6 +346,42 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	current_simulation_time = t1;
 
 	while (current_simulation_time < t2) {
+		if (cvode_steps >= max_cvode_steps) {
+			cvode_max_steps_reached++;
+			//printf("CVode max steps");
+			result = false;
+			break;
+		}
+
+		Real prev_time = current_simulation_time;
+		int result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		if (result < 0) {
+			// Try once more
+			result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		}
+		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
+			cvode_min_timestep_reached++;
+		}
+		if (result < 0) {
+			//printf("CVode failure: %u", result);
+			result = false;
+			break;
+		}
+
+		// Store relevant information for interpolation at any timepoint later
+		RetrieveCVodeInterpolationInfo();
+		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
+
+
+		cvode_steps++;
+	}
+
+	CVodeReInit(cvode_mem, t2, cvode_y);
+	CVodeSetStopTime(cvode_mem, t3);
+
+	current_simulation_time = t2;
+
+	while (current_simulation_time < t3) {
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
@@ -561,8 +598,11 @@ void Cell::SetTreatmentConcentration(Real t)
 
 void Cell::SetInhibitorConcentration(Real t)
 {
-	if(t > 8500.0){
-		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 10000.0;
+	if(t > 7200.0){
+		constant_species_y(model->GetConstantSpeciesByName("EGFRi", false)) = 3.289;
+	}
+	if(t > 16128) {
+		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 100;
 	}
 }
 
