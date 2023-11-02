@@ -601,8 +601,8 @@ void Cell::SetInhibitorConcentration(Real t)
 	if(t > 7200.0){
 		constant_species_y(model->GetConstantSpeciesByName("EGFRi", false)) = 3.289;
 	}
-	if(t > 16128) {
-		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 100;
+	if(t > 16128.0) {
+		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 100.0;
 	}
 }
 
