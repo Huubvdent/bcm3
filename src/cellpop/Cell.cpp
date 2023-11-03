@@ -303,6 +303,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	bool result = true;
 	OdeReal cell_end_time = end_time - creation_time;
 
+	
+
 	OdeReal t1 = 7200.0;
 	OdeReal t2 = 16128.0;
 	OdeReal t3 = cell_end_time;
@@ -619,6 +621,18 @@ void Cell::RetrieveCVodeInterpolationInfo()
 	cvt.cv_h		= cv_mem->cv_h;
 	cvt.cv_hu		= cv_mem->cv_hu;
 	cvt.cv_q		= cv_mem->cv_q;
+
+	time_t current_time = time(NULL);
+
+	std::string time = current_time.to_str();
+
+	std::ofstream outputFile(time + ".txt");
+	outputFile.open(time + ".txt", std::ios::app);
+
+	if (outputFile.is_open()) {
+		outputFile << "current_simulation_time: " << current_simulation_time << std::endl;
+		outputFile.close();
+	}
 
 	for(int i = 0; i < model->GetNumConstantSpecies(); i++){
 		constant_species_timepoints[i][cvode_steps] = constant_species_y[i];
