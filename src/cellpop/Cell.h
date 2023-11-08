@@ -3,6 +3,7 @@
 #include "Experiment.h"
 #include "LinearAlgebraSelector.h"
 #include <cvode/cvode.h>
+#include <fstream>
 
 class SBMLModel;
 
@@ -63,6 +64,10 @@ private:
 	size_t cvode_steps;
 	Real min_step_size;
 	bool completed;
+
+	std::string filename;
+	std::ofstream outputFile;
+	bool storing;
 
 	struct CVodeTimepoint {
 		CVodeTimepoint();
