@@ -14,7 +14,6 @@ bool TreatmentTrajectory::Load(Experiment* experiment, const bcm3::NetCDFDataFil
 	concentrations.resize(num_samples, num_timepoints);
 
 	data_file.GetValues(experiment->GetName(), "treatment_time", 0, num_timepoints, timepoints);
-	timepoints *= 3600;
 
 	for (size_t i = 0; i < num_samples; i++) {
 		VectorReal v;

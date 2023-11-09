@@ -499,21 +499,21 @@ bool Experiment::Load(const boost::property_tree::ptree& xml_node, const boost::
 
 
 
-#if 0
+#if 1
 		// Load treatment trajectories
-		auto lapatinib = std::make_unique<TreatmentTrajectory>();
-		if (lapatinib->Load(this, &file, "treatment_lapatinib")) {
-			treatment_trajectories.push_back(std::move(lapatinib));
-			treatment_trajectories_species_ix.push_back(cell_model.GetConstantSpeciesByName("lapatinib"));
+		auto MEKi = std::make_unique<TreatmentTrajectory>();
+		if (MEKi->Load(this, file, "treatment_MEKi")) {
+			treatment_trajectories.push_back(std::move(MEKi));
+			treatment_trajectories_species_ix.push_back(cell_model.GetConstantSpeciesByName("MEKi"));
 			selected_treatment_trajectory_sample.push_back(0);
 		} else {
 			return false;
 		}
 
-		auto trametinib = std::make_unique<TreatmentTrajectory>();
-		if (trametinib->Load(this, &file, "treatment_trametinib")) {
-			treatment_trajectories.push_back(std::move(trametinib));
-			treatment_trajectories_species_ix.push_back(cell_model.GetConstantSpeciesByName("trametinib"));
+		auto EGFRi = std::make_unique<TreatmentTrajectory>();
+		if (EGFRi->Load(this, file, "treatment_EGFRi")) {
+			treatment_trajectories.push_back(std::move(EGFRi));
+			treatment_trajectories_species_ix.push_back(cell_model.GetConstantSpeciesByName("EGFRi"));
 			selected_treatment_trajectory_sample.push_back(0);
 		} else {
 			return false;
