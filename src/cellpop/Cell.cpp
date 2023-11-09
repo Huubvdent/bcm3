@@ -7,6 +7,7 @@
 #include <sunnonlinsol/sunnonlinsol_newton.h>
 #include <fstream>
 #include "../../dependencies/cvode-5.3.0/src/cvode/cvode_impl.h"
+#include <cstdio>
 
 size_t Cell::total_num_simulations = 0;
 size_t Cell::cvode_max_steps_reached = 0;
@@ -257,13 +258,11 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		}
 	}
 
-	// storing = false;
-
-	// if(storing){
-	// 	int number =  rand();
-	// 	filename = std::to_string(number);
-	// 	std::ofstream outputFile(filename + ".txt");
-	// }
+	
+	// int number = rand();
+	// filename = std::to_string(number);
+	// std::ofstream outputFile(filename + ".txt");
+	
 	
 	completed = false;
 	replication_start_time = std::numeric_limits<Real>::quiet_NaN();
@@ -317,6 +316,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	OdeReal t2 = 15264.0;
 	OdeReal t3 = cell_end_time;
 
+	CVodeSetStopTime(cvode_mem, t1);
+
 	while (current_simulation_time < t1) {
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
@@ -327,9 +328,10 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 		Real prev_time = current_simulation_time;
 		int result = CVode(cvode_mem, t1, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		
 		// if (result < 0) {
 		// 	// Try once more
-		// 	result = CVode(cvode_mem, t1, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		// 	result = CVode(cvode_mem, t1, cvode_y, &current_simulation_time, CV_NORMAL);
 		// }
 		// if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
 		// 	cvode_min_timestep_reached++;
@@ -348,9 +350,10 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		cvode_steps++;
 	}
 
-	CVodeGetDky(cvode_mem, t1, 0, cvode_y);
-	CVodeReInit(cvode_mem, t1, cvode_y);
+	int init = CVodeReInit(cvode_mem, t1, cvode_y);
 	current_simulation_time = t1;
+
+	CVodeSetStopTime(cvode_mem, t2);
 
 	while (current_simulation_time < t2) {
 		if (cvode_steps >= max_cvode_steps) {
@@ -362,9 +365,10 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 		Real prev_time = current_simulation_time;
 		int result = CVode(cvode_mem, t2, cvode_y, &current_simulation_time, CV_ONE_STEP);
+
 		// if (result < 0) {
 		// 	// Try once more
-		// 	result = CVode(cvode_mem, t2, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		// 	result = CVode(cvode_mem, t2, cvode_y, &current_simulation_time, CV_NORMAL);
 		// }
 		// if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
 		// 	cvode_min_timestep_reached++;
@@ -377,15 +381,17 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 		// Store relevant information for interpolation at any timepoint later
 		RetrieveCVodeInterpolationInfo();
+		
 		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
 
 
 		cvode_steps++;
 	}
 
-	CVodeGetDky(cvode_mem, t2, 0, cvode_y);
-	CVodeReInit(cvode_mem, t2, cvode_y);
+	init = CVodeReInit(cvode_mem, t2, cvode_y);
 	current_simulation_time = t2;
+
+	CVodeSetStopTime(cvode_mem, t3);
 
 	while (current_simulation_time < t3) {
 		if (cvode_steps >= max_cvode_steps) {
@@ -397,21 +403,24 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 
 		Real prev_time = current_simulation_time;
 		int result = CVode(cvode_mem, t3, cvode_y, &current_simulation_time, CV_ONE_STEP);
-		if (result < 0) {
-			// Try once more
-			result = CVode(cvode_mem, t3, cvode_y, &current_simulation_time, CV_ONE_STEP);
-		}
-		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
-			cvode_min_timestep_reached++;
-		}
-		if (result < 0) {
-			//printf("CVode failure: %u", result);
-			result = false;
-			break;
-		}
+		
+		// if (result < 0) {
+		// 	// Try once more
+		// 	result = CVode(cvode_mem, t3, cvode_y, &current_simulation_time, CV_NORMAL);
+		// }
+		// if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
+		// 	cvode_min_timestep_reached++;
+		// }
+		// if (result < 0) {
+		// 	//printf("CVode failure: %u", result);
+		// 	result = false;
+		// 	break;
+		// }
 
 		// Store relevant information for interpolation at any timepoint later
+		
 		RetrieveCVodeInterpolationInfo();
+		
 		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
 
 
@@ -500,17 +509,24 @@ Real Cell::GetInterpolatedSpeciesValue(Real time, size_t species_ix, ESynchroniz
 	Real tn1 = cvt.cv_tn + tfuzz;
 	if ((cell_time - tp) * (cell_time - tn1) > 0.0) {
 		LOGERROR("Time error for interpolation");
-		// if(storing){
-		// 	outputFile.open(filename + ".txt", std::ios::app);
-		// 	LOGERROR("Added to file");
+		
+		// outputFile.open(filename + ".txt", std::ios::app);
+		// LOGERROR("Added to file");
 
-		// 	if (outputFile.is_open()) {
+		// if (outputFile.is_open()) {
 		// 		outputFile << "TIME ERROR";
 		// 		outputFile.close();
-		// 	}
 		// }
 		return std::numeric_limits<Real>::quiet_NaN();
-	}
+	} 
+	
+	// else {
+	// 	std::string filename_full = filename + ".txt";
+	// 	if (std::remove(filename_full.c_str()) != 0) {
+	// 		// Handle error if removal fails
+	// 		perror("Error removing file");
+	// 	}
+	// }
 
 	/* Sum the differentiated interpolating polynomial */
 	CVodeMem cv_mem = (CVodeMem)cvode_mem;
@@ -635,13 +651,12 @@ void Cell::RetrieveCVodeInterpolationInfo()
 	cvt.cv_hu		= cv_mem->cv_hu;
 	cvt.cv_q		= cv_mem->cv_q;
 
-	// if(storing){
-	// 	outputFile.open(filename + ".txt", std::ios::app);
+	
+	// outputFile.open(filename + ".txt", std::ios::app);
 
-	// 	if (outputFile.is_open()) {
-	// 		outputFile << "current_simulation_time: " << current_simulation_time << std::endl;
-	// 		outputFile.close();
-	// 	}
+	// if (outputFile.is_open()) {
+	// 	outputFile << "current_simulation_time: " << current_simulation_time << std::endl;
+	// 	outputFile.close();
 	// }
 		
 	
