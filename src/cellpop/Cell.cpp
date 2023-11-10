@@ -317,7 +317,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		Real prev_time = current_simulation_time;
@@ -332,7 +333,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		}
 		if (result < 0) {
 			//printf("CVode failure: %u", result);
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		// Store relevant information for interpolation at any timepoint later
@@ -354,7 +356,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		Real prev_time = current_simulation_time;
@@ -369,7 +372,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		}
 		if (result < 0) {
 			//printf("CVode failure: %u", result);
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		// Store relevant information for interpolation at any timepoint later
@@ -392,7 +396,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		Real prev_time = current_simulation_time;
@@ -407,7 +412,8 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 		}
 		if (result < 0) {
 			//printf("CVode failure: %u", result);
-			return false;
+			achieved_time = current_simulation_time + creation_time;
+			return result;
 		}
 
 		// Store relevant information for interpolation at any timepoint later
