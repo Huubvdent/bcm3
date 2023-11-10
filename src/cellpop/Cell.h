@@ -103,4 +103,7 @@ private:
 
 	derivative_fn derivative;
 	jacobian_fn jacobian;
+
+	bool bool_meki = false;
+	bool bool_egfri = false;
 };
