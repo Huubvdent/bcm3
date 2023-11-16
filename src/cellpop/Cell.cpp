@@ -508,21 +508,8 @@ Real Cell::GetInterpolatedSpeciesValue(Real time, size_t species_ix, ESynchroniz
 	Real tn1 = cvt.cv_tn + tfuzz;
 	if ((cell_time - tp) * (cell_time - tn1) > 0.0) {
 		LOGERROR("Time error for interpolation");
-		// outputFile.open(filename + ".txt", std::ios::app);
-		// if (outputFile.is_open()) {
-		// 	outputFile << "Time at interpolation error: " << time << std::endl;
-		// 	outputFile.close();
-		// }
 		return std::numeric_limits<Real>::quiet_NaN();
-	} 
-	
-	// else {
-	// 	std::string filename_full = filename + ".txt";
-	// 	if (std::remove(filename_full.c_str()) != 0) {
-	// 		// Handle error if removal fails
-	// 		perror("Error removing file");
-	// 	}
-	// }
+	}
 
 	/* Sum the differentiated interpolating polynomial */
 	CVodeMem cv_mem = (CVodeMem)cvode_mem;
@@ -625,11 +612,11 @@ void Cell::SetTreatmentConcentration(Real t)
 
 void Cell::SetInhibitorConcentration(Real t)
 {
-	if(bool_egfri){
-		constant_species_y(model->GetConstantSpeciesByName("EGFRi", false)) = 3.289;
+	if(t > 6048.0){
+		constant_species_y(model->GetConstantSpeciesByName("EGFRi", true)) = 3.289;
 	}
-	if(bool_meki) {
-		constant_species_y(model->GetConstantSpeciesByName("MEKi", false)) = 100.0;
+	if(t > 15264.0) {
+		constant_species_y(model->GetConstantSpeciesByName("MEKi", true)) = 100.0;
 	}
 }
 
