@@ -3,6 +3,7 @@
 #include "DataLikelihoodDuration.h"
 #include "DataLikelihoodTimeCourse.h"
 #include "interface.h"
+#include <fstream>
 
 std::shared_ptr<CellPopulationLikelihood> GetCellPopulationLikelihood(bcm3info* info, int* retval)
 {
@@ -98,7 +99,7 @@ void bcm3_rbridge_cellpop_get_simulated_trajectories(char** bcm3info_ptr, char**
 	if (!info || !ll) {
 		return;
 	}
-
+	
 	const Experiment* e = ll->GetExperiment(*experiment);
 	if (!e) {
 		*retval = -3;

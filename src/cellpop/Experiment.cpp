@@ -249,11 +249,6 @@ bool Experiment::EvaluateLogProbability(size_t threadix, const VectorReal& value
 						size_t simix = cell_model.GetSimulatedSpeciesByName(cell_model.GetConstantSpeciesName(treatment_trajectories_species_ix[j]));
 						simulated_trajectories[i][ti](simix) = treatment_trajectories[j]->GetConcentration(output_t, selected_treatment_trajectory_sample[j]);
 					}
-
-					std::stringstream ss;
-					ss << simulated_trajectories[i][ti];
-					LOG(ss.str().c_str());
-					LOG("hello");
 				}
 			}
 		}
