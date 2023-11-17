@@ -28,6 +28,7 @@ if(CMAKE_HOST_UNIX)
     set(CMAKE_BUILD_TYPE Release)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif(CMAKE_HOST_UNIX)
 
 add_subdirectory(dependencies/cluster-1.52a/src)
