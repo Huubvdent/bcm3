@@ -227,10 +227,14 @@ bool Experiment::EvaluateLogProbability(size_t threadix, const VectorReal& value
 		}
 
 		if (store_simulation) {
+			std::vector<std::string> treatments;
+			treatments.push_back("MEKi");
+			treatments.push_back("EGFRi");
 			for (size_t i = 0; i < active_cells; i++) {
 				cells[i]->RestartInterpolationIteration();
 			}
 			for (size_t ti = 0; ti < output_trajectories_timepoints.size(); ti++) {
+
 				Real output_t = output_trajectories_timepoints(ti);
 				for (size_t i = 0; i < active_cells; i++) {
 					for (size_t j = 0; j < cell_model.GetNumCVodeSpecies(); j++) {
@@ -238,13 +242,18 @@ bool Experiment::EvaluateLogProbability(size_t threadix, const VectorReal& value
 						simulated_trajectories[i][ti](simix) = cells[i]->GetInterpolatedSpeciesValue(output_t, j, ESynchronizeCellTrajectory::None);
 					}
 					for (size_t j = 0; j < cell_model.GetNumConstantSpecies(); j++) {
-						size_t simix = cell_model.GetSimulatedSpeciesFromConstantSpecies(j);
-						simulated_trajectories[i][ti](simix) = cells[i]->GetConstantSpeciesValueAtTime(j);
+						size_t simix = cell_model.GetSimulatedSpeciesByName(treatments[j]);
+						simulated_trajectories[i][ti](simix) = cells[i]->GetConstantSpeciesValueAtTime(output_t, j);
 					}
 					for (size_t j = 0; j < treatment_trajectories.size(); j++) {
 						size_t simix = cell_model.GetSimulatedSpeciesByName(cell_model.GetConstantSpeciesName(treatment_trajectories_species_ix[j]));
 						simulated_trajectories[i][ti](simix) = treatment_trajectories[j]->GetConcentration(output_t, selected_treatment_trajectory_sample[j]);
 					}
+
+					std::stringstream ss;
+					ss << simulated_trajectories[i][ti];
+					LOG(ss.str().c_str());
+					LOG("hello");
 				}
 			}
 		}

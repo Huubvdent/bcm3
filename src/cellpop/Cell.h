@@ -20,7 +20,7 @@ public:
 	bool Simulate(Real end_time, bool &die, bool &divide, Real& achieved_time);
 
 	Real GetInterpolatedSpeciesValue(Real time, size_t i, ESynchronizeCellTrajectory synchronize);
-	Real GetConstantSpeciesValueAtTime(size_t species_ix);
+	Real GetConstantSpeciesValueAtTime(Real time, size_t species_ix);
 	void RestartInterpolationIteration();
 	bool CellAliveAtTime(Real time, ESynchronizeCellTrajectory synchronize) const;
 	inline bool CellCompleted() const { return completed; }
