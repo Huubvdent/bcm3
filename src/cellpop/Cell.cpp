@@ -33,7 +33,7 @@ static void static_cvode_err_fn(int error_code, const char *module, const char *
 int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_data)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	cell->SetInhibitorConcentration(t);
+	cell->SetTreatmentConcentration(t);
 	if (Cell::use_generated_code) {
 		cell->derivative(NV_DATA_S(ydot), NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 	} else {
@@ -65,7 +65,7 @@ int Cell::static_cvode_rhs_fn(OdeReal t, N_Vector y, N_Vector ydot, void* user_d
 int Cell::static_cvode_jac_fn(OdeReal t, N_Vector y, N_Vector fy, SUNMatrix Jac, void* user_data, N_Vector ytmp1, N_Vector ytmp2, N_Vector ytmp3)
 {
 	Cell* cell = reinterpret_cast<Cell*>(user_data);
-	cell->SetInhibitorConcentration(t);
+	cell->SetTreatmentConcentration(t);
 	cell->jacobian(Jac, NV_DATA_S(y), cell->constant_species_y.data(), cell->cell_specific_transformed_variables.data(), cell->cell_specific_non_sampled_transformed_variables.data());
 
 #if 0
@@ -304,124 +304,98 @@ bool Cell::Simulate(Real end_time, bool& die, bool& divide, Real& achieved_time)
 	current_simulation_time = 0;
 	bool result = true;
 	OdeReal cell_end_time = end_time - creation_time;
-
-	
-
-	OdeReal t1 = 6048.0;
-	OdeReal t2 = 15264.0;
-	OdeReal t3 = cell_end_time;
-
-	CVodeSetStopTime(cvode_mem, t1);
-
-	while (current_simulation_time < t1) {
+	while (current_simulation_time < cell_end_time) {
 		if (cvode_steps >= max_cvode_steps) {
 			cvode_max_steps_reached++;
 			//printf("CVode max steps");
-			achieved_time = current_simulation_time + creation_time;
-			return result;
+			result = false;
+			break;
 		}
 
 		Real prev_time = current_simulation_time;
-		int result = CVode(cvode_mem, t1, cvode_y, &current_simulation_time, CV_ONE_STEP);
-		
+		int result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
 		if (result < 0) {
 			// Try once more
-			result = CVode(cvode_mem, t1, cvode_y, &current_simulation_time, CV_ONE_STEP);
+			result = CVode(cvode_mem, cell_end_time, cvode_y, &current_simulation_time, CV_ONE_STEP);
 		}
 		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
 			cvode_min_timestep_reached++;
 		}
 		if (result < 0) {
 			//printf("CVode failure: %u", result);
-			achieved_time = current_simulation_time + creation_time;
-			return result;
+			result = false;
+			break;
 		}
+
+#if 0
+		Real hcur;
+		CVodeGetCurrentStep(cvode_mem, &hcur);
+		int qcur;
+		CVodeGetCurrentOrder(cvode_mem, &qcur);
+
+		std::ofstream file("tmp.txt", std::ios::app);
+		file.precision(18);
+		file << "CVode step " << std::to_string(cvode_steps + 1);
+		file << "; time=" << current_simulation_time;
+		file << " hcur=" << hcur;
+		file << " qcur=" << qcur;
+		file <<std::endl;
+		//file << "cvode_y=" << EIGV(cvode_y).transpose() << std::endl;
+		file.close();
+#endif
 
 		// Store relevant information for interpolation at any timepoint later
 		RetrieveCVodeInterpolationInfo();
 		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
 
-
-		cvode_steps++;
-	}
-
-	int init = CVodeReInit(cvode_mem, t1, cvode_y);
-	current_simulation_time = t1;
-
-	CVodeSetStopTime(cvode_mem, t2);
-
-	bool_egfri = true;
-
-	while (current_simulation_time < t2) {
-		if (cvode_steps >= max_cvode_steps) {
-			cvode_max_steps_reached++;
-			//printf("CVode max steps");
-			achieved_time = current_simulation_time + creation_time;
-			return result;
+		if (DNA_replication_ix != std::numeric_limits<size_t>::max() && replication_start_time != replication_start_time) {
+			Real s = NV_Ith_S(cvode_y, DNA_replication_ix);
+			if (s > 1e-4) {
+				replication_start_time = InterpolateEventTime(DNA_replication_ix, 1e-4, true, prev_time);
+			}
+		}
+		if (DNA_replicated_ix != std::numeric_limits<size_t>::max() && replication_finish_time != replication_finish_time) {
+			Real s = NV_Ith_S(cvode_y, DNA_replicated_ix);
+			if (s > 1.95) {
+				replication_finish_time = InterpolateEventTime(DNA_replicated_ix, 1.95, true, prev_time);
+			}
+		}
+		if (PCNA_gfp_ix != std::numeric_limits<size_t>::max() && PCNA_gfp_increase_time != PCNA_gfp_increase_time) {
+			Real s = NV_Ith_S(cvode_y, PCNA_gfp_ix);
+			if (s > 0.5) {
+				PCNA_gfp_increase_time = InterpolateEventTime(PCNA_gfp_ix, 0.5, true, prev_time);
+			}
+		}
+		if (nuclear_envelope_ix != std::numeric_limits<size_t>::max() && nuclear_envelope_breakdown_time != nuclear_envelope_breakdown_time) {
+			Real s = NV_Ith_S(cvode_y, nuclear_envelope_ix);
+			if (s < 0.5) {
+				nuclear_envelope_breakdown_time = InterpolateEventTime(nuclear_envelope_ix, 0.5, false, prev_time);
+			}
+		}
+		if (chromatid_separation_ix != std::numeric_limits<size_t>::max() && anaphase_onset_time != anaphase_onset_time) {
+			if (NV_Ith_S(cvode_y, chromatid_separation_ix) > 1e-3) {
+				anaphase_onset_time = InterpolateEventTime(chromatid_separation_ix, 1e-3, true, prev_time);
+			}
+		}
+		if (cytokinesis_ix != std::numeric_limits<size_t>::max()) {
+			if (NV_Ith_S(cvode_y, cytokinesis_ix) > 1.0) {
+				achieved_time = InterpolateEventTime(cytokinesis_ix, 1.0, true, prev_time);
+				CalculateEndY(achieved_time);
+				divide = true;
+			}
+		}
+		if (apoptosis_ix != std::numeric_limits<size_t>::max()) {
+			if (NV_Ith_S(cvode_y, apoptosis_ix) > 1.0) {
+				achieved_time = InterpolateEventTime(apoptosis_ix, 1.0, true, prev_time);
+				CalculateEndY(achieved_time);
+				die = true;
+			}
 		}
 
-		Real prev_time = current_simulation_time;
-		int result = CVode(cvode_mem, t2, cvode_y, &current_simulation_time, CV_ONE_STEP);
-
-		if (result < 0) {
-			// Try once more
-			result = CVode(cvode_mem, t2, cvode_y, &current_simulation_time, CV_ONE_STEP);
+		if (die || (experiment->divide_cells && divide)) {
+			completed = true;
+			break;
 		}
-		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
-			cvode_min_timestep_reached++;
-		}
-		if (result < 0) {
-			//printf("CVode failure: %u", result);
-			achieved_time = current_simulation_time + creation_time;
-			return result;
-		}
-
-		// Store relevant information for interpolation at any timepoint later
-		RetrieveCVodeInterpolationInfo();
-		
-		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
-
-
-		cvode_steps++;
-	}
-
-
-
-	init = CVodeReInit(cvode_mem, t2, cvode_y);
-	current_simulation_time = t2;
-
-	bool_meki = true;
-
-	while (current_simulation_time < t3) {
-		if (cvode_steps >= max_cvode_steps) {
-			cvode_max_steps_reached++;
-			//printf("CVode max steps");
-			achieved_time = current_simulation_time + creation_time;
-			return result;
-		}
-
-		Real prev_time = current_simulation_time;
-		int result = CVode(cvode_mem, t3, cvode_y, &current_simulation_time, CV_ONE_STEP);
-		
-		if (result < 0) {
-			// Try once more
-			result = CVode(cvode_mem, t3, cvode_y, &current_simulation_time, CV_ONE_STEP);
-		}
-		if (result == CV_ERR_FAILURE || result == CV_CONV_FAILURE) {
-			cvode_min_timestep_reached++;
-		}
-		if (result < 0) {
-			//printf("CVode failure: %u", result);
-			achieved_time = current_simulation_time + creation_time;
-			return result;
-		}
-
-		// Store relevant information for interpolation at any timepoint later
-		
-		RetrieveCVodeInterpolationInfo();
-		
-		min_step_size = (std::min)(min_step_size, current_simulation_time - prev_time);
-
 
 		cvode_steps++;
 	}
@@ -608,19 +582,9 @@ void Cell::SetMutations()
 
 void Cell::SetTreatmentConcentration(Real t)
 {
-	for (size_t i = 0; i < experiment->treatment_trajectories.size(); i++) {
-		size_t ix = experiment->treatment_trajectories_species_ix[i];
-		constant_species_y(ix) = experiment->treatment_trajectories[i]->GetConcentration(t + creation_time, experiment->selected_treatment_trajectory_sample[i]);
-	}
-}
-
-void Cell::SetInhibitorConcentration(Real t)
-{
-	if(t > 6048.0){
-		constant_species_y(model->GetConstantSpeciesByName("EGFRi", true)) = 3.289;
-	}
-	if(t > 15264.0) {
-		constant_species_y(model->GetConstantSpeciesByName("MEKi", true)) = 100.0;
+	if(t > 0){
+		constant_species_y(model->GetConstantSpeciesByName("EGFRi", true)) = 3.289 / (1 + exp(-40 * (log(t) - log(6048.0))));
+		constant_species_y(model->GetConstantSpeciesByName("MEKi", true)) = 100.0 / (1 + exp(-40 * (log(t) - log(15264))));
 	}
 }
 
