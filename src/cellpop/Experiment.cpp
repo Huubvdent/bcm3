@@ -228,8 +228,8 @@ bool Experiment::EvaluateLogProbability(size_t threadix, const VectorReal& value
 
 		if (store_simulation) {
 			std::vector<std::string> treatments;
-			treatments.push_back("EGFRi");
 			treatments.push_back("MEKi");
+			treatments.push_back("EGFRi");
 			for (size_t i = 0; i < active_cells; i++) {
 				cells[i]->RestartInterpolationIteration();
 			}
