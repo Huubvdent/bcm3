@@ -7,7 +7,9 @@
 #include <sunnonlinsol/sunnonlinsol_newton.h>
 #include <fstream>
 #include "../../dependencies/cvode-5.3.0/src/cvode/cvode_impl.h"
-#include <cstdio>
+#include <torch/script.h>
+#include "VAE.h"
+
 
 size_t Cell::total_num_simulations = 0;
 size_t Cell::cvode_max_steps_reached = 0;
@@ -227,12 +229,86 @@ bool Cell::SetInitialConditionsFromOtherCell(const Cell* other)
 	return true;
 }
 
-bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol)
+bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, at::Tensor eigenvector, at::Tensor mean, at::Tensor std)
 {
 	cvode_steps = 0;
 	cvode_timepoint_iter = 0;
 
 	int sobol_sequence_ix = 0;
+
+	//Convert C++ vector to pytorch tensor
+	int n = transformed_variables.size();
+	
+
+#if 1
+	//Create input tensor with all regular input parameters
+	std::vector<float> variable_copy;
+	for(size_t i = 0; i < (n - 3); i++){
+		variable_copy.push_back((float) transformed_variables[i]);
+	}
+	
+	auto input_tensor = torch::zeros(n-3,torch::kFloat32);
+	const void* input_ptr = static_cast<const void*>(variable_copy.data());
+	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
+
+
+
+
+	//Create sobol sequence tensor as input for encoder
+	VectorReal& sobol_sequence = *sobol_sequence_values;
+
+	double unif_1 = sobol_sequence[0];
+	double unif_2 = sobol_sequence[1];
+
+	double prior_1 = transformed_variables[n-1];
+	double prior_2 = transformed_variables[n-2];
+
+	
+	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
+	double second_var = bcm3::QuantileNormal(unif_2, 0, prior_2);
+
+	//PCA conversion
+	std::vector<float> Variable_input_pca;
+
+	Variable_input_pca.push_back((float) first_var);
+	Variable_input_pca.push_back((float) second_var);
+
+	auto pca_tensor = torch::zeros(2,torch::kFloat32);
+	const void* pca_ptr = static_cast<const void*>(Variable_input_pca.data());
+	std::memcpy(pca_tensor.data_ptr(),pca_ptr,sizeof(float)*pca_tensor.numel());
+
+	at::Tensor variance_tensor = torch::matmul(pca_tensor, eigenvector);
+
+	at::Tensor log2scaled_input = torch::log2(input_tensor);
+
+	at::Tensor complete = log2scaled_input * torch::pow((torch::ones(n-3,torch::kFloat32) * 2), variance_tensor);
+
+	at::Tensor rescaled = torch::pow((torch::ones(n-3,torch::kFloat32) * 2), complete);
+
+	std::vector<float> result_vector(rescaled.data_ptr<float>(), rescaled.data_ptr<float>() + rescaled.numel());
+#endif
+
+	// //write tensors to memory to make comparison
+	// int randNum = rand()%(1000000 + 1);
+	// std::string unique_name = std::to_string(randNum);
+
+	// std::string weight_name_encoder = "output_tensors/" + unique_name + "_weight_encoder.pt";
+	// auto weight_encoder = torch::pickle_save(encoder->get_weights_fc1());
+	// std::ofstream fout1(weight_name_encoder, std::ios::out | std::ios::binary);
+	// fout1.write(weight_encoder.data(), weight_encoder.size());
+	// fout1.close();
+
+
+
+    for(size_t j = 0; j < n-3; j++){
+		cell_specific_transformed_variables[j] = (double) result_vector[j];
+	}
+
+	cell_specific_transformed_variables[n-3] = transformed_variables[n-3];
+
+	this->creation_time = (double) result_vector[entry_time_ix];
+
+#if 0
 	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
 		(*it)->ApplyVariabilityEntryTime(creation_time, *sobol_sequence_values, sobol_sequence_ix, transformed_variables, experiment->non_sampled_parameters, is_initial_cell);
 	}
@@ -250,15 +326,15 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
 			(*it)->ApplyVariabilityParameter(experiment->non_sampled_parameter_names[i], cell_specific_non_sampled_transformed_variables(i), *sobol_sequence_values, sobol_sequence_ix, transformed_variables, experiment->non_sampled_parameters, is_initial_cell);
 		}
-	}
+	}	
 
 	for (size_t i = 0; i < model->GetNumCVodeSpecies(); i++) {
 		for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
 			(*it)->ApplyVariabilitySpecies(model->GetCVodeSpeciesName(i), NV_Ith_S(cvode_y, i), *sobol_sequence_values, sobol_sequence_ix, transformed_variables, experiment->non_sampled_parameters, is_initial_cell);
 		}
 	}
-	
-	
+#endif
+
 	completed = false;
 	replication_start_time = std::numeric_limits<Real>::quiet_NaN();
 	replication_finish_time = std::numeric_limits<Real>::quiet_NaN();

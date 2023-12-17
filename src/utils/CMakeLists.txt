@@ -31,6 +31,8 @@ target_sources(utils
     Typedefs.h
     Utils.h
     Utils.cpp
+    VAE.cpp
+    VAE.h
     VectorUtils.h
     VectorUtils.cpp
     Version.h
@@ -39,8 +41,10 @@ target_sources(utils
 target_include_directories(utils
   PUBLIC
     .
+    ${TORCH_INCLUDE_DIR}
   PRIVATE
     ${NETCDF_INCLUDE_DIR}
+    
 )
 
 target_link_libraries(utils
@@ -49,6 +53,7 @@ target_link_libraries(utils
     Boost::headers
     ${Boost_LIBRARIES}
     Threads::Threads
+    ${TORCH_LIBRARIES}
   PRIVATE
     ${NETCDF_LIBRARIES}
     clusterc

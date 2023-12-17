@@ -33,7 +33,7 @@ namespace bcm3 {
 			return false;
 		}
 		if (log_info) {
-			LOG("Sample history clustering - samples in history: %d", n);
+			BCMLOG("Sample history clustering - samples in history: %d", n);
 		}
 
 #if 1
@@ -93,7 +93,7 @@ namespace bcm3 {
 			return false;
 		} else {
 			if (log_info) {
-				LOG("Sample history clustering - unique samples: %u", used_sample_ix.size());
+				BCMLOG("Sample history clustering - unique samples: %u", used_sample_ix.size());
 			}
 			if (used_sample_ix.size() > max_samples) {
 				while (used_sample_ix.size() > max_samples) {
@@ -101,7 +101,7 @@ namespace bcm3 {
 					used_sample_ix.erase(used_sample_ix.begin() + drop_sample);
 				}
 				if (log_info) {
-					LOG("Sample history clustering - downsampled to %u samples for spectral clustering", max_samples);
+					BCMLOG("Sample history clustering - downsampled to %u samples for spectral clustering", max_samples);
 				}
 			}
 		}

@@ -99,9 +99,9 @@ namespace bcm3 {
 
 	void ProposalGaussianMixture::LogInfo() const
 	{
-		LOG("  GMM proposal with %u components", gmm->GetNumComponents());
+		BCMLOG("  GMM proposal with %u components", gmm->GetNumComponents());
 		for (ptrdiff_t i = 0; i < gmm->GetNumComponents(); i++) {
-			LOG("    Component %u; scale=%8.5f, weight=%8.5f, condition number=%6g", i + 1, scales(i), gmm->GetWeights()(i), 1.0 / gmm->GetCovarianceDecomp(i).rcond());
+			BCMLOG("    Component %u; scale=%8.5f, weight=%8.5f, condition number=%6g", i + 1, scales(i), gmm->GetWeights()(i), 1.0 / gmm->GetCovarianceDecomp(i).rcond());
 		}
 	}
 
@@ -155,8 +155,8 @@ namespace bcm3 {
 			Real AIC_adjust_factor = min_ess / num_history_samples;
 
 			if (log_info) {
-				LOG("Fitting GMMs...");
-				LOG("Minimum effective sample size: %g out of %zu samples; AIC_adjust_factor = %g", min_ess, num_history_samples, AIC_adjust_factor);
+				BCMLOG("Fitting GMMs...");
+				BCMLOG("Minimum effective sample size: %g out of %zu samples; AIC_adjust_factor = %g", min_ess, num_history_samples, AIC_adjust_factor);
 			}
 
 			// Fit GMMs for increasing number of components and select the one with the lowest AIC
@@ -166,13 +166,13 @@ namespace bcm3 {
 				std::shared_ptr<GMM> test_gmm_k = std::make_shared<GMM>();
 				if (min_ess < num_components[i] * (1 + std::min(num_variables/2, (size_t)10))) {
 					if (log_info) {
-						LOG("GMM num_components=%2zu - not enough effective samples", num_components[i], test_gmm_k->GetAIC());
+						BCMLOG("GMM num_components=%2zu - not enough effective samples", num_components[i], test_gmm_k->GetAIC());
 					}
 				} else if (test_gmm_k->Fit(history, num_history_samples, num_components[i], rng, num_history_samples / min_ess)) {
 					Real nparam = 0.5 * test_gmm_k->GetAIC() + test_gmm_k->GetLogLikelihood();
 					Real adjusted_AIC = 2.0 * nparam - 2.0 * AIC_adjust_factor * test_gmm_k->GetLogLikelihood();
 					if (log_info) {
-						LOG("GMM num_components=%2zu - AIC=%.6g, adjusted AIC=%.6g", num_components[i], test_gmm_k->GetAIC(), adjusted_AIC);
+						BCMLOG("GMM num_components=%2zu - AIC=%.6g, adjusted AIC=%.6g", num_components[i], test_gmm_k->GetAIC(), adjusted_AIC);
 					}
 
 					if (test_gmm_k->GetAIC() < best_aic) {
@@ -181,7 +181,7 @@ namespace bcm3 {
 					}
 				} else {
 					if (log_info) {
-						LOG("GMM num_components=%2zu failed", num_components[i]);
+						BCMLOG("GMM num_components=%2zu failed", num_components[i]);
 					}
 				}
 			}
@@ -189,21 +189,21 @@ namespace bcm3 {
 #if 1
 			if (log_info) {
 				if (gmm) {
-					LOG("Selected GMM with %zu components (selection through full AIC)", gmm->GetNumComponents());
+					BCMLOG("Selected GMM with %zu components (selection through full AIC)", gmm->GetNumComponents());
 					for (ptrdiff_t i = 0; i < gmm->GetNumComponents(); i++) {
 						std::stringstream str;
 						str << gmm->GetMean(i).transpose();
-						LOG("Mean component %zd: %s", i, str.str().c_str());
+						BCMLOG("Mean component %zd: %s", i, str.str().c_str());
 
-						LOG("Covariance component %zd:", i);
+						BCMLOG("Covariance component %zd:", i);
 						for (ptrdiff_t j = 0; j < gmm->GetCovariance(i).rows(); j++) {
 							std::stringstream().swap(str);
 							str << gmm->GetCovariance(i).row(j);
-							LOG("%s", str.str().c_str());
+							BCMLOG("%s", str.str().c_str());
 						}
 					}
 				} else {
-					LOG("Unable to fit even a single Gaussian, resorting to a single Gaussian with covariance based on the prior");
+					BCMLOG("Unable to fit even a single Gaussian, resorting to a single Gaussian with covariance based on the prior");
 				}
 			}
 #endif

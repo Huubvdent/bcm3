@@ -5,7 +5,7 @@ if(CMAKE_HOST_WIN32)
 endif(CMAKE_HOST_WIN32)
 if(CMAKE_HOST_UNIX)
     set(NETCDF_LIBRARIES "libnetcdf.so")
-    set(NETCDF_INCLUDE_DIR "/usr/include")
+    set(NETCDF_INCLUDE_DIR "/opt/homebrew/Cellar/netcdf-cxx/4.3.1_1/include")
 endif(CMAKE_HOST_UNIX)
 
 # libSBML settings

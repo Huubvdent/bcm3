@@ -3,7 +3,7 @@
 #include "Experiment.h"
 #include "LinearAlgebraSelector.h"
 #include <cvode/cvode.h>
-#include <fstream>
+#include "VAE.h"
 
 class SBMLModel;
 
@@ -15,7 +15,7 @@ public:
 
 	bool SetInitialConditionsFromModel(const std::map<size_t, Experiment::SetSpecies>& set_species_map, const std::map<size_t, size_t>& set_init_map, const std::map<size_t, std::vector<int>>& ratio_active_map, const std::map<size_t, std::vector<int>>& ratio_inactive_map, const std::map<size_t, std::vector<size_t>>& ratio_total_active,const std::map<size_t, std::vector<size_t>>& ratio_total_inactive,const VectorReal& transformed_values, Real time);
 	bool SetInitialConditionsFromOtherCell(const Cell* other);
-	bool Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol);
+	bool Initialize(Real creation_time, const VectorReal& transformed_variables, VectorReal* sobol_sequence_values, bool is_initial_cell, bool calculate_synchronization_point, Real abs_tol, Real rel_tol, size_t entry_time_ix, at::Tensor eigenvector, at::Tensor mean, at::Tensor std);
 
 	bool Simulate(Real end_time, bool &die, bool &divide, Real& achieved_time);
 

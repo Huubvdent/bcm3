@@ -2,7 +2,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#define LOG(message, ...)			do { bcm3::logger->Log(bcm3::Logger::Info   , __FILE__, __LINE__, message, ## __VA_ARGS__); } while (0)
+#define BCMLOG(message, ...)			do { bcm3::logger->Log(bcm3::Logger::Info   , __FILE__, __LINE__, message, ## __VA_ARGS__); } while (0)
 #define LOGWARNING(message, ...)	do { bcm3::logger->Log(bcm3::Logger::Warning, __FILE__, __LINE__, message, ## __VA_ARGS__); } while (0)
 #define LOGERROR(message, ...)		do { bcm3::logger->Log(bcm3::Logger::Error  , __FILE__, __LINE__, message, ## __VA_ARGS__); } while (0)
 

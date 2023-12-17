@@ -50,7 +50,7 @@ namespace bcm3 {
 	{
 		bool result = true;
 
-		LOG("Starting sampling loop...");
+		BCMLOG("Starting sampling loop...");
 		UpdateProgress(0.0, true);
 		size_t total_samples = num_samples * use_every_nth;
 		ptrdiff_t si = 0;

@@ -267,9 +267,9 @@ int predict(const po::variables_map& vm)
 	}
 
 	double prediction_time = timer.GetElapsedSeconds();
-	LOG("  Integration time: %.3g seconds", prediction_time);
-	LOG("  Number of likelihood evaluations: %u", num_likelihood_evaluations);
-	LOG("  Evaluations per second: %.0f", num_likelihood_evaluations / prediction_time);
+	BCMLOG("  Integration time: %.3g seconds", prediction_time);
+	BCMLOG("  Number of likelihood evaluations: %u", num_likelihood_evaluations);
+	BCMLOG("  Evaluations per second: %.0f", num_likelihood_evaluations / prediction_time);
 
 	sample_file.Close();
 	output_file.Close();

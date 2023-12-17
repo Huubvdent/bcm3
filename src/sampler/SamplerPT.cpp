@@ -120,7 +120,7 @@ namespace bcm3 {
 			sample_history = expected_sample_history / history_subsampling;
 		}
 		if (adapt_proposal_times > 0) {
-			LOG("Using history size %zd with 1 in %zd subsampling for proposal adaptation", sample_history, history_subsampling);
+			BCMLOG("Using history size %zd with 1 in %zd subsampling for proposal adaptation", sample_history, history_subsampling);
 		}
 
 		// Initialize chains
@@ -172,7 +172,7 @@ namespace bcm3 {
 	{
 		bool result = true;
 
-		LOG("Finding starting point...");
+		BCMLOG("Finding starting point...");
 		for (auto& chain : chains) {
 			result = chain->FindStartingPosition();
 			if (!result) {
@@ -180,7 +180,7 @@ namespace bcm3 {
 			}
 		}
 	
-		LOG("Starting sampling loop...");
+		BCMLOG("Starting sampling loop...");
 		size_t total_samples = num_samples * use_every_nth;
 		Real max_lposterior = -std::numeric_limits<Real>::infinity();
 		for (size_t si = 0; si < total_samples; si++) {
@@ -219,7 +219,7 @@ namespace bcm3 {
 
 			if ((*chains.rbegin())->GetLogPowerPosterior() > max_lposterior) {
 				max_lposterior = (*chains.rbegin())->GetLogPowerPosterior();
-				LOG("New max log posterior: %g", max_lposterior);
+				BCMLOG("New max log posterior: %g", max_lposterior);
 			}
 
 			if ((si + 1) % use_every_nth == 0) {
@@ -230,7 +230,7 @@ namespace bcm3 {
 					UpdateProgress(si / (Real)total_samples, true);
 
 					LogStatistics();
-					LOG("Updating proposal...");
+					BCMLOG("Updating proposal...");
 					bool result = true;
 					for (auto& chain : chains) {
 						chain->AdaptProposalAsync();
@@ -246,7 +246,7 @@ namespace bcm3 {
 				}
 				if (stop_proposal_scaling > 0 && sample_ix > stop_proposal_scaling) {
 					if (!proposal_scaling_adaptations_done) {
-						LOG("Stopping adaptation of proposal scale");
+						BCMLOG("Stopping adaptation of proposal scale");
 						proposal_scaling_adaptations_done = true;
 					}
 				}
@@ -259,15 +259,15 @@ namespace bcm3 {
 	void SamplerPT::LogStatistics()
 	{
 		// Statistics
-		LOG("");
-		LOG("Acceptance statistics:");
-		LOG("Temperature | Mutate (all) | Exchange (all)");
+		BCMLOG("");
+		BCMLOG("Acceptance statistics:");
+		BCMLOG("Temperature | Mutate (all) | Exchange (all)");
 		for (const auto& chain : chains) {
 			chain->LogStatistics();
 		}
 
-		LOG("");
-		LOG("Proposal info:");
+		BCMLOG("");
+		BCMLOG("Proposal info:");
 		(*chains.rbegin())->LogProposalInfo();
 	}
 
