@@ -243,16 +243,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 #if 1
 	//Create input tensor with all regular input parameters
 	std::vector<float> variable_copy;
-	for(size_t i = 0; i < (n - 3); i++){
+	for(size_t i = 0; i < (n - 5); i++){
 		variable_copy.push_back((float) transformed_variables[i]);
 	}
 	
-	auto input_tensor = torch::zeros(n-3,torch::kFloat32);
+	auto input_tensor = torch::zeros(n-5,torch::kFloat32);
 	const void* input_ptr = static_cast<const void*>(variable_copy.data());
 	std::memcpy(input_tensor.data_ptr(),input_ptr,sizeof(float)*input_tensor.numel());
-
-
-
 
 	//Create sobol sequence tensor as input for encoder
 	VectorReal& sobol_sequence = *sobol_sequence_values;
@@ -281,9 +278,9 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	at::Tensor log2scaled_input = torch::log2(input_tensor);
 
-	at::Tensor complete = log2scaled_input * torch::pow((torch::ones(n-3,torch::kFloat32) * 2), variance_tensor);
+	at::Tensor complete = log2scaled_input * torch::pow((torch::ones(n-5,torch::kFloat32) * 2), variance_tensor);
 
-	at::Tensor rescaled = torch::pow((torch::ones(n-3,torch::kFloat32) * 2), complete);
+	at::Tensor rescaled = torch::pow((torch::ones(n-5,torch::kFloat32) * 2), complete);
 
 	std::vector<float> result_vector(rescaled.data_ptr<float>(), rescaled.data_ptr<float>() + rescaled.numel());
 #endif
@@ -300,13 +297,15 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 
 
-    for(size_t j = 0; j < n-3; j++){
+    for(size_t j = 0; j < n-5; j++){
 		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
 
 	cell_specific_transformed_variables[n-3] = transformed_variables[n-3];
+	cell_specific_transformed_variables[n-4] = transformed_variables[n-4];
+	cell_specific_transformed_variables[n-5] = transformed_variables[n-5];
 
-	this->creation_time = (double) result_vector[entry_time_ix];
+	this->creation_time = creation_time;
 
 #if 0
 	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {
