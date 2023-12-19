@@ -598,7 +598,7 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 	boost::random::uniform_01<Real> unif;
 	for (int i = 0; i < sobol_sequence_values.size(); i++) {
 		sobol_sequence_values[i].resize(3);
-		for (int j = 0; j < 2; j++) {
+		for (int j = 0; j < 3; j++) {
 			sobol_sequence_values[i](j) = unif(*sobol_sequence);
 		}
 	}

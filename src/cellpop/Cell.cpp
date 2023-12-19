@@ -260,7 +260,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double prior_1 = transformed_variables[n-1];
 	double prior_2 = transformed_variables[n-2];
-	double prior_3 = transformed_variables[n-2];
+	double prior_3 = transformed_variables[n-3];
 
 	
 	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
