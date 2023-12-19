@@ -3,6 +3,7 @@
 #include "Experiment.h"
 #include "LinearAlgebraSelector.h"
 #include <cvode/cvode.h>
+#include <fstream>
 #include "VAE.h"
 
 class SBMLModel;
