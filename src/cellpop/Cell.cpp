@@ -305,6 +305,13 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 	cell_specific_transformed_variables[n-4] = transformed_variables[n-4];
 	cell_specific_transformed_variables[n-5] = transformed_variables[n-5];
 
+	double ratio_erk = tranformed_variables[n-6];
+
+	GetCVodeSpeciesByName("active_" + name_var.substr(6));
+
+	NV_Ith_S(cvode_y, GetCVodeSpeciesByName("active_ERK")) = ratio_erk * 1000;
+	NV_Ith_S(cvode_y, GetCVodeSpeciesByName("inactive_ERK")) = (1-ratio_erk) * 1000;
+
 	this->creation_time = creation_time;
 
 #if 0
