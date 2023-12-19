@@ -256,13 +256,16 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 
 	double unif_1 = sobol_sequence[0];
 	double unif_2 = sobol_sequence[1];
+	double unif_3 = sobol_sequence[2];
 
 	double prior_1 = transformed_variables[n-1];
 	double prior_2 = transformed_variables[n-2];
+	double prior_3 = transformed_variables[n-2];
 
 	
 	double first_var = bcm3::QuantileNormal(unif_1, 0, prior_1);
 	double second_var = bcm3::QuantileNormal(unif_2, 0, prior_2);
+	double entry_var = bcm3::QuantileUniform(unif_3, 0, prior_3);
 
 	//PCA conversion
 	std::vector<float> Variable_input_pca;
@@ -301,12 +304,7 @@ bool Cell::Initialize(Real creation_time, const VectorReal& transformed_variable
 		cell_specific_transformed_variables[j] = (double) result_vector[j];
 	}
 
-	double ratio_erk = transformed_variables[n-6];
-
-	NV_Ith_S(cvode_y, model->GetCVodeSpeciesByName("active_ERK")) = ratio_erk * 1000;
-	NV_Ith_S(cvode_y, model->GetCVodeSpeciesByName("inactive_ERK")) = (1-ratio_erk) * 1000;
-
-	this->creation_time = creation_time;
+	this->creation_time = creation_time - entry_var;
 
 #if 0
 	for (auto it = experiment->cell_variabilities.begin(); it != experiment->cell_variabilities.end(); ++it) {

@@ -593,11 +593,11 @@ bool Experiment::Initialize(const boost::property_tree::ptree& xml_node)
 
 #if 1
 	// Temporary for autoencoder
-	sobol_sequence = std::make_shared<boost::random::sobol>(2);
+	sobol_sequence = std::make_shared<boost::random::sobol>(3);
 	sobol_sequence_values.resize(initial_number_of_cells * 100);
 	boost::random::uniform_01<Real> unif;
 	for (int i = 0; i < sobol_sequence_values.size(); i++) {
-		sobol_sequence_values[i].resize(2);
+		sobol_sequence_values[i].resize(3);
 		for (int j = 0; j < 2; j++) {
 			sobol_sequence_values[i](j) = unif(*sobol_sequence);
 		}
